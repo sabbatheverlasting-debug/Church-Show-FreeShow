@@ -1,3 +1,6 @@
+import { parseChurchBible } from "../../types/ChurchBible"
+import { scriptures, scripturesCache } from "../stores"
+import { setActiveScripture } from "./bible"
 import { installChurchStylePack } from "./churchStylePack"
 import { get } from "svelte/store"
 import { uid } from "uid"
@@ -45,10 +48,17 @@ export function importChurchPackages(files: { name?: string; content: string; ex
         duplicates = 0,
         unsupported = 0
     const errors: string[] = []
-    const containsStylePack = files.some((file) => { try { return JSON.parse(file.content)?.format === "churchshow-style-pack" } catch { return false } })
+    const containsStylePack = files.some((file) => {
+        try {
+            return JSON.parse(file.content)?.format === "churchshow-style-pack"
+        } catch {
+            return false
+        }
+    })
     for (const file of files) {
         try {
             const name = file.name || "Import"
+            if (/(^|[\\/])(__MACOSX|\._[^\\/]*)($|[\\/])/.test(name)) continue
             if (containsStylePack && (file.extension === "svg" || /(?:^|\/)README\.txt$/i.test(name))) continue
             if (["txt", "md"].includes(file.extension || "")) {
                 const resource: ChurchResource = { id: name, title: name.replace(/\.(txt|md)$/i, ""), kind: "study", sections: [{ text: file.content }] }
@@ -61,7 +71,23 @@ export function importChurchPackages(files: { name?: string; content: string; ex
                 continue
             }
             const raw = JSON.parse(file.content)
-            if (raw?.format === "churchshow-style-pack") { installed += installChurchStylePack(raw); continue }
+            if (raw?.format === "churchshow-style-pack") {
+                installed += installChurchStylePack(raw)
+                continue
+            }
+            const bible = parseChurchBible(raw, name)
+            if (bible) {
+                const id = "church_bible_" + encodeURIComponent(bible.name)
+                if (get(scriptures)[id]) {
+                    duplicates++
+                    continue
+                }
+                scripturesCache.update((cache) => ({ ...cache, [id]: bible }))
+                scriptures.update((entries) => ({ ...entries, [id]: { name: bible.name, id, copyright: bible.metadata?.copyright || "" } }))
+                setActiveScripture(id)
+                installed++
+                continue
+            }
             const legacy = raw?.format === "local-bible-study" ? [raw] : Array.isArray(raw?.studies) ? raw.studies : null
             const packet = validateChurchPackage(legacy ? { format: "church-show-package", version: 1, id: "legacy-studies", title: name, resources: legacy.map((study: any) => ({ id: study.id || study.title, title: study.title, kind: "study", sections: study.sections?.map((section: any) => ({ text: section.text, title: section.heading, source: study.source })) })) } : raw)
             for (const resource of packet.resources) {

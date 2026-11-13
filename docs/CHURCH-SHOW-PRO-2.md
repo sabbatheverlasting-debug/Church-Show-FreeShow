@@ -88,3 +88,9 @@ The user approved publishing the code and logo to the public repository on
 - `packages/Church-Show-Sangstund-1.zip` includes ten UI themes (five light/five dark), and background SVGs can also be used outside the app. Automatic import in the mobile app still requires its adapter.
 - UI and slide text contrast checked at >= 4.5:1 for the palette endpoints; projector brightness and room conditions still require a real-screen check.
 - Browser screenshot verification was unavailable in this workspace; the vector background contact sheet was rendered and inspected.
+
+## Offline Bible import — development update
+
+Shared import now accepts personal `church-show-bible` JSON (including SRB26 compact chapters) and Pure Words KJV JSON, directly or inside ZIP. Text and source metadata are retained, imported Bibles use native offline scripture storage, and importing the same name again preserves the existing copy. No private Bible or book contents are committed. Verified against the supplied SRB26 (66 books, 1189 chapters, 31170 verses) and KJV (66 books, 1189 chapters, 31102 verses). Four adapter tests and four package tests pass; Vite production build passes. This change has not been installed or tested on a Mac.
+
+Remaining: USX import for SFB15/STB, personal preinstallation, EPUB/legacy media adapters, and the other roadmap features. The supplied SFB15/STB ZIP contains 93 actual USX books (excluding macOS resource files).
