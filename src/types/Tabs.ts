@@ -9,6 +9,7 @@ export interface Category {
     path?: string
     id?: string
     type?: "youtube" | "vimeo"
+    churchDetached?: boolean // retained folder, excluded from the active background library
     mediaType?: "background" | "foreground"
     url?: string
     default?: boolean

@@ -618,9 +618,13 @@ function dropFileInDrawerNavigation(drag) {
 export function addDrawerFolder(file: any, type: "media" | "audio") {
     // check if folder already exists
     const path: string = file.path || window.api.showFilePath(file)
-    const exists = Object.values(type === "media" ? get(mediaFolders) : get(audioFolders)).find((a) => a.path === path)
+    const exists = Object.entries(type === "media" ? get(mediaFolders) : get(audioFolders)).find(([, folder]) => folder.path === path)
     if (exists) {
-        newToast("error.folder_exists")
+        if (type === "media" && exists[1].churchDetached) {
+            const id = exists[0]
+            mediaFolders.update((folders) => ({ ...folders, [id]: { ...folders[id], churchDetached: false } }))
+            drawerTabsData.update((tabs) => ({ ...tabs, media: { ...tabs.media, enabled: true, activeSubTab: id } }))
+        } else newToast("error.folder_exists")
         return
     }
 

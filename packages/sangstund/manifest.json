@@ -1,0 +1,230 @@
+{
+  "format": "churchshow-style-pack",
+  "version": 1,
+  "id": "sangstund-v1",
+  "name": "Sångstund · lugn och ljus",
+  "themes": [
+    {
+      "id": "himmel-mork",
+      "name": "Church Show · Himmel · mörk",
+      "mode": "dark",
+      "colors": {
+        "surface": "#203849",
+        "card": "#182D3C",
+        "border": "#2D4C60",
+        "ink": "#F5F1E7",
+        "subtle": "#ADBDC9",
+        "accent": "#C6A45D"
+      }
+    },
+    {
+      "id": "himmel-ljus",
+      "name": "Church Show · Himmel · ljus",
+      "mode": "light",
+      "colors": {
+        "surface": "#E1EBF1",
+        "card": "#F1F5F7",
+        "border": "#C8DAE5",
+        "ink": "#203849",
+        "subtle": "#526C7C",
+        "accent": "#29546D"
+      }
+    },
+    {
+      "id": "hav-mork",
+      "name": "Church Show · Hav · mörk",
+      "mode": "dark",
+      "colors": {
+        "surface": "#203E48",
+        "card": "#17303A",
+        "border": "#31545D",
+        "ink": "#EFF6F4",
+        "subtle": "#ADC5C7",
+        "accent": "#D5BB80"
+      }
+    },
+    {
+      "id": "hav-ljus",
+      "name": "Church Show · Hav · ljus",
+      "mode": "light",
+      "colors": {
+        "surface": "#E4EFF0",
+        "card": "#F3F8F7",
+        "border": "#C7DDDE",
+        "ink": "#21434A",
+        "subtle": "#536F73",
+        "accent": "#2E626A"
+      }
+    },
+    {
+      "id": "skymning-mork",
+      "name": "Church Show · Skymning · mörk",
+      "mode": "dark",
+      "colors": {
+        "surface": "#3B3448",
+        "card": "#2B2636",
+        "border": "#53485F",
+        "ink": "#F7F1ED",
+        "subtle": "#C5B9CA",
+        "accent": "#D9B98B"
+      }
+    },
+    {
+      "id": "skymning-ljus",
+      "name": "Church Show · Skymning · ljus",
+      "mode": "light",
+      "colors": {
+        "surface": "#EEE8F0",
+        "card": "#FAF7FA",
+        "border": "#DCD0E0",
+        "ink": "#40324B",
+        "subtle": "#78687D",
+        "accent": "#6A4C78"
+      }
+    },
+    {
+      "id": "linne-mork",
+      "name": "Church Show · Linne · mörk",
+      "mode": "dark",
+      "colors": {
+        "surface": "#3E3934",
+        "card": "#2C2825",
+        "border": "#57504A",
+        "ink": "#FBF4E8",
+        "subtle": "#C4B9AB",
+        "accent": "#D7BC8A"
+      }
+    },
+    {
+      "id": "linne-ljus",
+      "name": "Church Show · Linne · ljus",
+      "mode": "light",
+      "colors": {
+        "surface": "#F1ECE2",
+        "card": "#FAF8F1",
+        "border": "#E0D5C2",
+        "ink": "#433C32",
+        "subtle": "#7D7160",
+        "accent": "#79603C"
+      }
+    },
+    {
+      "id": "silver-mork",
+      "name": "Church Show · Silver · mörk",
+      "mode": "dark",
+      "colors": {
+        "surface": "#333D49",
+        "card": "#252D37",
+        "border": "#4A5766",
+        "ink": "#F3F5F8",
+        "subtle": "#B3BECD",
+        "accent": "#ADC6E0"
+      }
+    },
+    {
+      "id": "silver-ljus",
+      "name": "Church Show · Silver · ljus",
+      "mode": "light",
+      "colors": {
+        "surface": "#E9EDF3",
+        "card": "#F7F9FC",
+        "border": "#D1DBE7",
+        "ink": "#2D3D51",
+        "subtle": "#63758A",
+        "accent": "#3D5B82"
+      }
+    }
+  ],
+  "backgrounds": [
+    {
+      "id": "himmel-mork",
+      "name": "Himmel · mörk",
+      "top": "#162C40",
+      "bottom": "#0C1B29",
+      "glow": "#D5B875",
+      "text": "#F5F1E7",
+      "accent": "#C6A45D"
+    },
+    {
+      "id": "himmel-ljus",
+      "name": "Himmel · ljus",
+      "top": "#EAF2F6",
+      "bottom": "#D5E2EA",
+      "glow": "#FFFFFF",
+      "text": "#203849",
+      "accent": "#29546D"
+    },
+    {
+      "id": "hav-mork",
+      "name": "Hav · mörk",
+      "top": "#173D48",
+      "bottom": "#102B35",
+      "glow": "#97C6CB",
+      "text": "#EFF6F4",
+      "accent": "#D5BB80"
+    },
+    {
+      "id": "hav-ljus",
+      "name": "Hav · ljus",
+      "top": "#EAF4F2",
+      "bottom": "#D9E8E7",
+      "glow": "#FFFFFF",
+      "text": "#21434A",
+      "accent": "#2E626A"
+    },
+    {
+      "id": "skymning-mork",
+      "name": "Skymning · mörk",
+      "top": "#322B44",
+      "bottom": "#211C31",
+      "glow": "#D5A996",
+      "text": "#F7F1ED",
+      "accent": "#D9B98B"
+    },
+    {
+      "id": "skymning-ljus",
+      "name": "Skymning · ljus",
+      "top": "#F3EDF3",
+      "bottom": "#E3D9E8",
+      "glow": "#FFFFFF",
+      "text": "#40324B",
+      "accent": "#6A4C78"
+    },
+    {
+      "id": "linne-mork",
+      "name": "Linne · mörk",
+      "top": "#3B332A",
+      "bottom": "#27221D",
+      "glow": "#D4AD71",
+      "text": "#FBF4E8",
+      "accent": "#D7BC8A"
+    },
+    {
+      "id": "linne-ljus",
+      "name": "Linne · ljus",
+      "top": "#F7F1E5",
+      "bottom": "#E9DFCD",
+      "glow": "#FFFFFF",
+      "text": "#433C32",
+      "accent": "#79603C"
+    },
+    {
+      "id": "silver-mork",
+      "name": "Silver · mörk",
+      "top": "#283545",
+      "bottom": "#172330",
+      "glow": "#A8C2E1",
+      "text": "#F3F5F8",
+      "accent": "#ADC6E0"
+    },
+    {
+      "id": "silver-ljus",
+      "name": "Silver · ljus",
+      "top": "#EDF2F8",
+      "bottom": "#DAE4EF",
+      "glow": "#FFFFFF",
+      "text": "#2D3D51",
+      "accent": "#3D5B82"
+    }
+  ]
+}

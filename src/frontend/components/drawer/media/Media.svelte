@@ -58,7 +58,7 @@
     let specialTabs = ["online", "inputs"]
     $: isProviderSection = contentProviders.some((p) => p.providerId === active)
     $: notFolders = ["all", ...specialTabs, ...contentProviders.map((p) => p.providerId)]
-    $: isLocalFolder = !!(active && $mediaFolders[active])
+    $: isLocalFolder = !!(active && $mediaFolders[active] && !$mediaFolders[active].churchDetached)
     $: rootPath = isLocalFolder ? $mediaFolders[active!]?.path || "" : ""
 
     let path = ""
@@ -172,7 +172,7 @@
             if (active === prevActive) return
             prevActive = active
 
-            requestFiles(Object.values($mediaFolders).map((a) => a.path!))
+            requestFiles(Object.values($mediaFolders).filter((a) => !a.churchDetached).map((a) => a.path!))
         } else if (path?.length) {
             if (path === prevActive) return
             prevActive = path

@@ -20,7 +20,12 @@
 
     $: activeSubTab = $drawerTabsData.media?.activeSubTab || ""
 
-    $: foldersList = keysToID($mediaFolders)
+    $: foldersList = keysToID($mediaFolders).filter((folder) => !folder.churchDetached)
+    $: previousFolders = keysToID($mediaFolders).filter((folder) => folder.churchDetached)
+    function restoreFolder(id: string) {
+        mediaFolders.update((folders) => ({ ...folders, [id]: { ...folders[id], churchDetached: false } }))
+        drawerTabsData.update((tabs) => ({ ...tabs, media: { ...tabs.media, enabled: true, activeSubTab: id } }))
+    }
     $: favoritesListLength = Object.values($media).filter((a) => !a.audio && a.favourite).length
 
     let allCount = 0
@@ -115,3 +120,12 @@
         </MaterialButton>
     </div>
 </NavigationSections>
+{#if previousFolders.length}
+    <details style="padding:10px;font-size:0.9em;">
+        <summary>Tidigare bakgrundsmappar ({previousFolders.length})</summary>
+        <p style="opacity:0.7;margin:8px 0;">Filerna finns kvar. Välj en mapp för att visa den igen.</p>
+        {#each previousFolders as folder}
+            <MaterialButton disabled={readOnly} title={folder.path} on:click={() => restoreFolder(folder.id)} small><T id={folder.name} /> · Visa igen</MaterialButton>
+        {/each}
+    </details>
+{/if}

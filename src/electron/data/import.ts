@@ -1,3 +1,4 @@
+import { prepareChurchStyleFile } from "./churchStylePack"
 import Database from "better-sqlite3"
 import path, { join } from "path"
 import protobufjs from "protobufjs"
@@ -99,7 +100,7 @@ export async function importShow(id: string, files: string[] | null) {
                 if (file.toLowerCase().endsWith(".zip")) data.push(...await decompressZipStream(file, false, { maxEntries: 10000, maxUncompressedBytes: 256 * 1024 * 1024 }))
                 else data.push(await readFile(file))
             }
-            sendToMain(ToMain.IMPORT2, { channel: id, data })
+            sendToMain(ToMain.IMPORT2, { channel: id, data: data.map(prepareChurchStyleFile) })
         } catch {
             sendToMain(ToMain.ALERT, "ZIP-paketet kunde inte öppnas. Kontrollera filen och storleken (max 256 MB uppackat).")
         }

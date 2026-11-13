@@ -1,3 +1,4 @@
+import { resetDefaultBackground } from "../utils/churchFolders"
 import { importChurchPackages } from "../converters/churchPackage"
 import { get } from "svelte/store"
 import type { ContentProviderId } from "../../electron/contentProviders/base/types"
@@ -20,7 +21,7 @@ import { getActiveOutputs } from "../components/helpers/output"
 import { loadShows, saveTextCache } from "../components/helpers/setShow"
 import { checkName, getGlobalGroup, getLabelId } from "../components/helpers/show"
 import { joinTimeBig } from "../components/helpers/time"
-import { defaultThemes } from "../components/settings/tabs/defaultThemes"
+import { loadChurchThemes } from "../components/settings/tabs/churchThemes"
 import { processTimecodeFrame, updateTimelineStatus, updateTimelineTime } from "../components/timeline/timecode"
 import { importBibles } from "../converters/bible"
 import { convertCalendar } from "../converters/calendar"
@@ -137,14 +138,14 @@ export const mainResponses: MainResponses = {
         projectTemplates.set(a.projectTemplates || {})
     },
     [Main.OVERLAYS]: (a) => overlays.set(a),
-    [Main.TEMPLATES]: (a) => templates.set(a),
+    [Main.TEMPLATES]: (a) => templates.set(resetDefaultBackground(a, true)),
     [Main.EVENTS]: (a) => events.set(a),
     [Main.MEDIA]: (a) => media.set(a),
     [Main.THEMES]: (a) => {
-        themes.set(Object.keys(a).length ? a : clone(defaultThemes))
+        themes.set(loadChurchThemes(a))
 
         // update if themes are loaded after settings
-        if (get(theme) !== "default") updateThemeValues(get(themes)[get(theme)])
+        updateThemeValues(get(themes)[get(theme)] || get(themes).default)
     },
     [Main.DRIVE_API_KEY]: (a) => driveKeys.set(a),
     [Main.HISTORY]: (a) => {

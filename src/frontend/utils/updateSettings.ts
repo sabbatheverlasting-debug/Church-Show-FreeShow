@@ -1,3 +1,4 @@
+import { detachPreviousBackgroundFolders, resetDefaultBackground } from "./churchFolders"
 import { get } from "svelte/store"
 import { uid } from "uid"
 import { OUTPUT } from "../../types/Channels"
@@ -128,6 +129,14 @@ export function updateSyncedSettings(data: any) {
 }
 
 export function updateSettings(data: any) {
+    // Once only: keep old background folder references available for restoration.
+    if (data.mediaFolders && !data.special?.churchBackgroundFoldersResetV1) {
+        data.mediaFolders = detachPreviousBackgroundFolders(data.mediaFolders)
+        data.special = { ...data.special, churchBackgroundFoldersResetV1: true }
+        if (data.drawerTabsData?.media) data.drawerTabsData.media.activeSubTab = "all"
+    }
+
+
     // pre v0.8.2 (data contains SaveListSyncedSettings, but it gets overwritten and removed on first save)
 
     // pre v1.6.1 (equalizerConfig was not in audioEffects)
@@ -360,7 +369,7 @@ const updateList: { [key in SaveListSettings | SaveListSyncedSettings]: any } = 
             delete style.messageTemplate
         })
 
-        styles.set(v)
+        styles.set(resetDefaultBackground(v))
     },
     profiles: (v: any) => profiles.set(v),
     audioFolders: (v: any) => audioFolders.set(v),

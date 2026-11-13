@@ -113,7 +113,7 @@
     let openedPage = ""
 </script>
 
-<MaterialButton variant="outlined" style="margin-bottom:12px;" on:click={() => { sendMain(Main.IMPORT, { channel: "church_package", format: { name: "Gemensam import", extensions: ["zip", "json", "txt", "md"] } }); activePopup.set(null) }}>Gemensam import · ZIP, böcker, studier och frågor</MaterialButton>
+<MaterialButton variant="outlined" style="margin-bottom:12px;" on:click={() => { sendMain(Main.IMPORT, { channel: "church_package", format: { name: "Gemensam import", extensions: ["zip", "json", "txt", "md"] } }); activePopup.set(null) }}>Gemensam import · ZIP, böcker, studier, bakgrunder och teman</MaterialButton>
 
 {#if openedPage === "powerpoint"}
     <MaterialButton class="popup-back" icon="back" iconSize={1.3} title="actions.back" on:click={() => (openedPage = "")} />

@@ -78,3 +78,13 @@ without native install scripts. macOS packaging and hardware testing are pending
 
 The user approved publishing the code and logo to the public repository on
 2026-11-13. macOS packaging is performed by the Intel Monterey workflow.
+
+## 2.0.1 — visual identity and shared style packs
+
+- Own logo, blue/gold startup window and base UI palette, including saved standard-theme migration. Custom user themes remain intact.
+- Existing local Media folders are detached once; their paths remain under “Tidigare bakgrundsmappar”. Restore each one with “Visa igen”, or select its path through Add folder. Files on disk, Audio folders and saved presentations are not deleted.
+- Default template/output background assignments reset once; later choices are preserved.
+- Shared `churchshow-style-pack` v1: declarative colors, ten 4K SVG backgrounds and ten native song templates. The same ZIP installs through Shared import. No scripts or external resources in backgrounds.
+- `packages/Church-Show-Sangstund-1.zip` includes ten UI themes (five light/five dark), and background SVGs can also be used outside the app. Automatic import in the mobile app still requires its adapter.
+- UI and slide text contrast checked at >= 4.5:1 for the palette endpoints; projector brightness and room conditions still require a real-screen check.
+- Browser screenshot verification was unavailable in this workspace; the vector background contact sheet was rendered and inspected.

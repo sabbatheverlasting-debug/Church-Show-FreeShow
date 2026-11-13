@@ -102,7 +102,7 @@
         <!-- logo -->
         <h1 style="align-self: center;width: 100%;padding: 0px 10px;text-align: center;font-size: 1.8em;">Church Show Pro 2</h1>
         <!-- <div class="logo">
-            <img style="height: 35px;" src="./icon.png" alt="FreeShow-logo" draggable={false} />
+            <img style="height: 35px;" src="./icon.png" alt="Church Show" draggable={false} />
             <h1 style="color: var(--text);font-size: 1.7em;">Church Show Pro 2</h1>
         </div> -->
     </span>

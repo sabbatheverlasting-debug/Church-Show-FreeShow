@@ -24,7 +24,7 @@ jobs:
       - run: python -m pip install setuptools
       - run: npm ci
       - name: Church Show import tests
-        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchPackage.test.ts src/electron/data/zip.test.ts
+        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchPackage.test.ts src/electron/data/zip.test.ts src/types/ChurchStylePack.test.ts src/frontend/components/settings/tabs/churchThemes.test.ts src/frontend/utils/churchFolders.test.ts
       - name: Unit tests (record upstream failures)
         continue-on-error: true
         run: npm run test:unit
@@ -42,4 +42,10 @@ jobs:
         with:
           name: Church-Show-Pro-2-Intel-Monterey
           path: dist/*.dmg
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Church-Show-Sangstund-Temapaket
+          path: packages/Church-Show-Sangstund-1.zip
           if-no-files-found: error

@@ -57,8 +57,8 @@ export function createData(paths: MainFilePaths) {
 
     setExampleTemplates()
     mediaFolders.update((a) => {
-        if (paths.pictures) a.pictures = { name: "category.pictures", icon: "folder", path: paths.pictures, default: true }
-        if (paths.videos) a.videos = { name: "category.videos", icon: "folder", path: paths.videos, default: true }
+        if (paths.pictures) a.pictures = { name: "category.pictures", icon: "folder", path: paths.pictures, default: true, churchDetached: true }
+        if (paths.videos) a.videos = { name: "category.videos", icon: "folder", path: paths.videos, default: true, churchDetached: true }
         return a
     })
     audioFolders.update((a) => {

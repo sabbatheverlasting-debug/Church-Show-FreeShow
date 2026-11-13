@@ -25,7 +25,7 @@
 <div style="text-align: center;">
     <p>Byggt på FreeShow 1.6.7 från ChurchApps · GPL-3.0</p>
     <div class="logo">
-        <img style="height: 35px;" src="./icon.png" alt="FreeShow-logo" draggable={false} />
+        <img style="height: 35px;" src="./icon.png" alt="Church Show" draggable={false} />
         <h1 style="color: var(--text);font-size: 1.7em;">Church Show Pro 2</h1>
     </div>
 
