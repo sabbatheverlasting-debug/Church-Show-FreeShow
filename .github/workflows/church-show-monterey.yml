@@ -13,6 +13,8 @@ jobs:
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v5
         with:
           node-version: 22
@@ -28,8 +30,9 @@ jobs:
         continue-on-error: true
         run: |
           cp src/electron/utils/files.ts /tmp/church-show-files.ts
-          git show 436d4b634878ba723da1d1373637384ec700ce16:src/electron/utils/files.ts > src/electron/utils/files.ts
           trap 'cp /tmp/church-show-files.ts src/electron/utils/files.ts' EXIT
+          git show 436d4b634878ba723da1d1373637384ec700ce16:src/electron/utils/files.ts > /tmp/upstream-files.ts
+          cp /tmp/upstream-files.ts src/electron/utils/files.ts
           npx vitest run --config config/testing/vitest.config.ts src/electron/cloud/syncManager.test.ts
       - run: npm run build
       - run: npx electron-builder --config config/building/church-show.yaml --mac dmg --x64 --publish never
