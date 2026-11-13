@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { dropChurchText } from "../../converters/churchTextDrop"
     import { selected } from "../../stores"
     import { mediaExtensions } from "../../values/extensions"
     import { type DropAreas, ondrop, validateDrop } from "../helpers/drop"
@@ -63,6 +64,16 @@
 
             selected.set({ id: "urls", data: urls })
             ondrop(e, id)
+            return
+        }
+
+        const plainText = e.dataTransfer?.getData("text/plain")
+        if (plainText?.trim() && ["project", "slides", "all_slides", "slide"].includes(id)) {
+            e.stopPropagation()
+            const item = e.target.closest(".selectElem")?.getAttribute("data-item")
+            let index: number | undefined
+            try { index = item ? JSON.parse(item).index : undefined } catch { /* append */ }
+            await dropChurchText(plainText, id, index)
             return
         }
 

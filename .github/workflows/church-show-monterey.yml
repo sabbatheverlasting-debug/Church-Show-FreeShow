@@ -1,4 +1,4 @@
-name: Church Show Intel Monterey
+name: Church Show Pro 2 Intel Monterey
 on:
   push:
     branches: [church-show-monterey]
@@ -23,6 +23,8 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install setuptools
       - run: npm ci
+      - name: Church Show import tests
+        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchPackage.test.ts src/electron/data/zip.test.ts
       - name: Unit tests (record upstream failures)
         continue-on-error: true
         run: npm run test:unit
@@ -38,6 +40,6 @@ jobs:
       - run: npx electron-builder --config config/building/church-show.yaml --mac dmg --x64 --publish never
       - uses: actions/upload-artifact@v4
         with:
-          name: Church-Show-FreeShow-Intel-Monterey
+          name: Church-Show-Pro-2-Intel-Monterey
           path: dist/*.dmg
           if-no-files-found: error

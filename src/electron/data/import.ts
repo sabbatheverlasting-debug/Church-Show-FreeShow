@@ -92,6 +92,20 @@ const specialImports = {
 export async function importShow(id: string, files: string[] | null) {
     if (!files?.length) return
 
+    if (id === "church_package") {
+        try {
+            const data: FileData[] = []
+            for (const file of files) {
+                if (file.toLowerCase().endsWith(".zip")) data.push(...await decompressZipStream(file, false, { maxEntries: 10000, maxUncompressedBytes: 256 * 1024 * 1024 }))
+                else data.push(await readFile(file))
+            }
+            sendToMain(ToMain.IMPORT2, { channel: id, data })
+        } catch {
+            sendToMain(ToMain.ALERT, "ZIP-paketet kunde inte öppnas. Kontrollera filen och storleken (max 256 MB uppackat).")
+        }
+        return
+    }
+
     let importId = id
     let data: (FileData | string)[] = []
 

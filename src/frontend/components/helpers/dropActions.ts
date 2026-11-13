@@ -25,6 +25,8 @@ import { downloadOnlineMedia, getExtension, getFileName, getMediaLayerType, getM
 import { addToPos, getIndexes, mover } from "./mover"
 import { getLayoutRef } from "./show"
 import { getVariableNameId } from "./showActions"
+import { loadShows } from "./setShow"
+import { getSlideText } from "../edit/scripts/textStyle"
 import { _show } from "./shows"
 
 function getId(drag: Selected): string {
@@ -240,6 +242,19 @@ export const dropActions = {
 
             history({ id: "UPDATE", newData: { data: show, remember: { project: projectId, index, replacePlaceholder: isReplacing } }, location: { page: "show", id: "show" } })
             return
+        }
+
+        if (drag.id === "show_drawer") {
+            const cues = data.filter((item) => get(shows)[item.id]?.category === "church_cues")
+            if (cues.length) {
+                await loadShows(cues.map((item) => item.id))
+                data = data.map((item) => {
+                    const show = get(showsCache)[item.id]
+                    if (show?.category !== "church_cues") return item
+                    const notes = Object.values(show.slides).map((slide) => slide.notes || getSlideText(slide)).join("\n")
+                    return { id: uid(), type: "section", name: show.name, notes, color: "#C6A45D" }
+                })
+            }
         }
 
         h.newData = { key: "shows", data: [] }

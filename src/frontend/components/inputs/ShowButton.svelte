@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { droppedAudio, pairChurchAudio } from "../../converters/churchAudio"
     import type { ClickEvent } from "../../../types/Main"
     import { AudioPlayer } from "../../audio/audioPlayer"
     import { activeEdit, activeFocus, activePage, activeProject, activeShow, categories, editingProjectTemplate, effects, focusMode, globalTags, media, notFound, outLocked, outputs, overlayCategories, overlays, playerVideos, playingAudio, projects, projectTemplates, refreshEditSlide, shows, showsCache, special, styles, textCache } from "../../stores"
@@ -18,6 +19,15 @@
     import { getTextSnippet, highlightText } from "../quicksearch/searchHighlight"
     import HiddenInput from "./HiddenInput.svelte"
     import MaterialButton from "./MaterialButton.svelte"
+
+    function pairDrop(event: DragEvent) {
+        if (type !== "show" || readOnly) return
+        const path = droppedAudio(event)
+        if (!path) return
+        event.preventDefault()
+        event.stopPropagation()
+        void pairChurchAudio(id, path)
+    }
 
     export let id: string
     export let show: any // ShowList | ShowRef
@@ -264,7 +274,7 @@
     $: showTemplateName = type === "show_placeholder" ? (show.name && show.name !== "—" ? show.name : translateText("new.placeholder")) + (showPlaceholderShowName ? ` (${showPlaceholderShowName})` : "") : ""
 </script>
 
-<div id="show_{id}" class="main" class:isProject class:played={show.played}>
+<div on:dragover|preventDefault on:drop={pairDrop} id="show_{id}" class="main" class:isProject class:played={show.played}>
     <MaterialButton on:click={click} on:dblclick={doubleClick} {isActive} showOutline={outline} class="context {$$props.class}{readOnly ? '_readonly' : ''}" style="font-weight: normal;--outline-color: {activeOutput || 'var(--secondary)'};{$notFound.show?.includes(id) ? 'background-color: rgb(255 0 0 / 0.2);' : ''}{$$props.style || ''}" tab>
         <div class="row" style={type === "show_placeholder" ? "font-style: italic;" : ""}>
             <span class="cell" style={isProject ? `width: 100%;max-width: ${show.layoutInfo?.name || show.scheduleLength ? 92 : 100}%;` : `width: 75%;min-width: 120px;max-width: calc(100% ${showNumber ? "- var(--number-width)" : ""} - var(--modified-width, 0px));`}>
@@ -338,6 +348,10 @@
             <p class="snippet">{@html highlightText(snippet, searchValue)}</p>
         {/if}
     </MaterialButton>
+    {#if type === "show" && $shows[id]?.quickAccess?.churchAudio}
+        <span style="font-size:0.8em;padding:2px 8px;" title="Ljudet startar på första bilden och fortsätter mellan verserna">♫ {$shows[id].quickAccess.churchAudio.name}</span>
+        {#if !readOnly}<button title="Koppla loss ljudfilen" on:click|stopPropagation={() => pairChurchAudio(id, null)}>Koppla loss</button>{/if}
+    {/if}
 
     {#if match !== null}
         <span class="match-indicator" data-title="{match}%">

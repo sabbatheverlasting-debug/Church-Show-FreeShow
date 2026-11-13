@@ -4,6 +4,9 @@ export const settingsTabs: SettingsTabs[] = ["general", "display_settings", "sty
 
 export const drawerTabs = {
     shows: { name: "tabs.shows", icon: "shows", title: "tabs.shows_info" },
+    books: { name: "Böcker", icon: "scripture", title: "Böcker och källtexter" },
+    questions: { name: "Frågor", icon: "shows", title: "Frågesport och Bibelmanna" },
+    cues: { name: "Hållpunkter", icon: "calendar", title: "Återanvändbara hållpunkter" },
     media: { name: "tabs.media", icon: "media", title: "" },
     audio: { name: "tabs.audio", icon: "audio", title: "" },
     overlays: { name: "tabs.overlays", icon: "overlays", title: "" },

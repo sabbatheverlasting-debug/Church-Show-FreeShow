@@ -1,3 +1,4 @@
+import { importChurchPackages } from "../converters/churchPackage"
 import { get } from "svelte/store"
 import type { ContentProviderId } from "../../electron/contentProviders/base/types"
 import type { ToMainSendPayloads } from "../../types/IPC/ToMain"
@@ -578,6 +579,7 @@ export const mainResponses: MainResponses = {
         const data = mainData as { content: string; name?: string; extension?: string }[]
 
         const receiveIMPORT = {
+            church_package: () => importChurchPackages(data),
             // FreeShow
             freeshow: () => importShow(data),
             freeshow_project: () => importProject(data),

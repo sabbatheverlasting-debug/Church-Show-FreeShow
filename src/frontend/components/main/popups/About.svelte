@@ -23,9 +23,10 @@
 </script>
 
 <div style="text-align: center;">
+    <p>Byggt på FreeShow 1.6.7 från ChurchApps · GPL-3.0</p>
     <div class="logo">
-        <img style="height: 35px;" src="./import-logos/freeshow.webp" alt="FreeShow-logo" draggable={false} />
-        <h1 style="color: var(--text);font-size: 1.7em;">FreeShow</h1>
+        <img style="height: 35px;" src="./icon.png" alt="FreeShow-logo" draggable={false} />
+        <h1 style="color: var(--text);font-size: 1.7em;">Church Show Pro 2</h1>
     </div>
 
     <p style="font-size: 0.8em;margin-top: 2px;">

@@ -79,6 +79,8 @@ export function compressToZip(entries: { name: string; content?: Buffer | string
 }
 
 export interface DecompressStreamOptions {
+    maxEntries?: number
+    maxUncompressedBytes?: number
     // Return output path to write to disk, or undefined to buffer in memory
     getOutputPath?: (fileName: string) => string | undefined
 }
@@ -109,6 +111,8 @@ export async function decompressZipStream(file: string, asBuffer = false, option
     return new Promise((resolve, reject) => {
         const data: { content: Buffer | string; name: string; extension: string }[] = []
         let hasFinished = false
+        let entryCount = 0
+        let totalBytes = 0
 
         const rejectOnce = (error: unknown, zipfile?: yauzl.ZipFile) => {
             if (hasFinished) return
@@ -145,6 +149,12 @@ export async function decompressZipStream(file: string, asBuffer = false, option
             zipfile.on("entry", (entry: yauzl.Entry) => {
                 if (hasFinished) return
 
+                entryCount++
+                totalBytes += entry.uncompressedSize
+                if (entryCount > (options?.maxEntries ?? Infinity) || totalBytes > (options?.maxUncompressedBytes ?? Infinity)) {
+                    rejectOnce(new Error("ZIP-paketet är för stort efter uppackning."), zipfile)
+                    return
+                }
                 const fileName = (entry.fileName as any as Buffer).toString("utf8")
 
                 // Skip directories

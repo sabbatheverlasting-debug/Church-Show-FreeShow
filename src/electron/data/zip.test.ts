@@ -108,3 +108,19 @@ describe("compressToZip", () => {
         expect(fs.existsSync(zipPath)).toBe(true)
     })
 })
+
+
+describe("shared import archive limits", () => {
+    it("rejects an archive exceeding the uncompressed byte budget", async () => {
+        fs.mkdirSync(h.tempRoot, { recursive: true })
+        const location = path.join(h.tempRoot, "bounded.zip")
+        await compressToZip([{ name: "resource.txt", content: "x".repeat(100) }], location)
+        await expect(decompressZipStream(location, false, { maxUncompressedBytes: 10 })).rejects.toThrow("för stort")
+    })
+    it("rejects too many entries", async () => {
+        fs.mkdirSync(h.tempRoot, { recursive: true })
+        const location = path.join(h.tempRoot, "entries.zip")
+        await compressToZip([{ name: "one.txt", content: "one" }, { name: "two.txt", content: "two" }], location)
+        await expect(decompressZipStream(location, false, { maxEntries: 1 })).rejects.toThrow("för stort")
+    })
+})
