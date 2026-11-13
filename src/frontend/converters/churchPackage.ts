@@ -1,3 +1,4 @@
+import { churchContentName } from "../../types/ChurchContentName"
 import { parseUsxBibles } from "../../types/ChurchUsx"
 import type { Bible } from "json-bible/lib/Bible"
 import { parseChurchBible } from "../../types/ChurchBible"
@@ -20,7 +21,10 @@ export function installChurchResource(resource: ChurchResource, packageId: strin
     const category = churchCategories[resource.kind]
     if (!get(categories)[category]) history({ id: "UPDATE", newData: { data: { name: labels[resource.kind], icon: "shows" } }, oldData: { id: category }, location: { page: "drawer", id: "category_shows" } })
     const show = new ShowObj(false, category, uid(), Date.now(), false)
-    show.name = resource.title
+    const baseName = churchContentName(resource.title)
+    const usedNames = new Set(Object.values(get(shows)).map((show) => show.name.toLocaleLowerCase()))
+    show.name = baseName
+    for (let suffix = 2; usedNames.has(show.name.toLocaleLowerCase()); suffix++) show.name = `${baseName} (${suffix})`
     show.origin = "church-package"
     show.meta = { publisher: resource.source || "" }
     const layout = show.layouts[show.settings.activeLayout]
@@ -57,8 +61,9 @@ export function importChurchPackages(files: { name?: string; content: string; ex
         unsupported = 0
     const errors: string[] = []
     function installBible(bible: Bible) {
+        bible.name = churchContentName(bible.name)
         const id = "church_bible_" + encodeURIComponent(bible.name)
-        if (get(scriptures)[id]) return false
+        if (get(scriptures)[id] || Object.values(get(scriptures)).some((entry) => entry.name.toLocaleLowerCase() === bible.name.toLocaleLowerCase())) return false
         scripturesCache.update((cache) => ({ ...cache, [id]: bible }))
         scriptures.update((entries) => ({ ...entries, [id]: { name: bible.name, id, copyright: bible.metadata?.copyright || "" } }))
         setActiveScripture(id)
