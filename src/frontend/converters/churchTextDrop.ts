@@ -6,11 +6,19 @@ import { loadShows } from "../components/helpers/setShow"
 import { activeProject, activeShow, showsCache } from "../stores"
 import { convertText } from "./txt"
 
-export async function dropChurchText(text: string, area: string, index?: number) {
+export async function dropChurchText(text: string, area: string, index?: number, source?: string) {
     const access = getAccess("shows")
     if (["read", "none"].includes(access.global)) return
     const data = convertText({ name: text.trim().slice(0, 70), text: splitChurchText(text).join("\n\n"), noFormatting: true, returnData: true })
     if (!data?.show) return
+    if (source) {
+        data.show.meta.publisher = source
+        for (const slide of Object.values(data.show.slides)) {
+            for (const item of slide.items) item.style = "left:100px;top:110px;width:1720px;height:780px;"
+            slide.notes = source
+            slide.items.push({ style: "left:100px;top:940px;width:1720px;height:90px;", lines: [{ text: [{ value: source, style: "font-size:28px;color:#d6ba79;" }] }] })
+        }
+    }
     if (area === "project") {
         const project = get(activeProject)
         if (!project) return

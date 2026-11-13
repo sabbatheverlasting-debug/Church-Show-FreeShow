@@ -88,3 +88,20 @@ The user approved publishing the code and logo to the public repository on
 - `packages/Church-Show-Sangstund-1.zip` includes ten UI themes (five light/five dark), and background SVGs can also be used outside the app. Automatic import in the mobile app still requires its adapter.
 - UI and slide text contrast checked at >= 4.5:1 for the palette endpoints; projector brightness and room conditions still require a real-screen check.
 - Browser screenshot verification was unavailable in this workspace; the vector background contact sheet was rendered and inspected.
+
+## Offline Bible import — development update
+
+Shared import now accepts personal `church-show-bible` JSON (including SRB26 compact chapters) and Pure Words KJV JSON, directly or inside ZIP. Text and source metadata are retained, imported Bibles use native offline scripture storage, and importing the same name again preserves the existing copy. No private Bible or book contents are committed. Verified against the supplied SRB26 (66 books, 1189 chapters, 31170 verses) and KJV (66 books, 1189 chapters, 31102 verses). Four adapter tests and four package tests pass; Vite production build passes. This change has not been installed or tested on a Mac.
+
+Remaining: USX import for SFB15/STB, personal preinstallation, EPUB/legacy media adapters, and the other roadmap features. The supplied SFB15/STB ZIP contains 93 actual USX books (excluding macOS resource files).
+
+## 2.0.2 — personal Bible and book packages
+
+- Shared import accepts standalone EPUB/USX and ZIP packages containing them, in addition to SRB26/Pure Words JSON. Mac ZIP resource files are ignored.
+- USX books are grouped by translation and sorted by canonical book number. Inline text is retained; headings and footnotes are kept out of projected verses. Footnotes and alternate lettered verses are retained in metadata. Metadata.xml is preserved where supplied. There is not yet a dedicated notes reader.
+- EPUB follows the OPF spine order and retains title, author, chapter text and source. Imported markup is converted to plain text; scripts and external chapter references are excluded. ZIP and EPUB decompression have size and entry limits; temporary files are removed.
+- Books are stored as chapters in native show files, with a title slide only. The Books reader offers chapter selection and full-book text search. Dragged selections create slides with a source footer on every slide.
+- Personal content is provided separately from the public app. Import it once with Shared import; the four Bibles and sixteen books then remain available offline. SRB26 is selected after import. This is not a publicly bundled Bible distribution or a preinstalled personal DMG.
+- Actual supplied content validated: SFB15 66 books/1189 chapters/31032 verse entries; STB NT 27 books/260 chapters/7941 numbered verse entries (alternate ending retained in metadata); sixteen EPUBs, including the two-book Swedish package and fourteen-book REMNANT library.
+- Full REMNANT commentary JSON indexing, song/audio package pairing, reading plans and other legacy formats remain outside this release. EPUB books from those packages are supported.
+- Focused tests pass; local renderer build and Electron TypeScript check pass. Full svelte-check retains the upstream 194 errors. Mac/projector interaction still requires testing on the user's hardware.

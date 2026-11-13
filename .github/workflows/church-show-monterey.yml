@@ -24,7 +24,7 @@ jobs:
       - run: python -m pip install setuptools
       - run: npm ci
       - name: Church Show import tests
-        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchPackage.test.ts src/electron/data/zip.test.ts src/types/ChurchStylePack.test.ts src/frontend/components/settings/tabs/churchThemes.test.ts src/frontend/utils/churchFolders.test.ts
+        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchPackage.test.ts src/types/ChurchBible.test.ts src/types/ChurchUsx.test.ts src/types/ChurchEpub.test.ts src/electron/data/zip.test.ts src/types/ChurchStylePack.test.ts src/frontend/components/settings/tabs/churchThemes.test.ts src/frontend/utils/churchFolders.test.ts
       - name: Unit tests (record upstream failures)
         continue-on-error: true
         run: npm run test:unit

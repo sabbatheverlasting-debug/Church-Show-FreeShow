@@ -72,8 +72,19 @@
             e.stopPropagation()
             const item = e.target.closest(".selectElem")?.getAttribute("data-item")
             let index: number | undefined
-            try { index = item ? JSON.parse(item).index : undefined } catch { /* append */ }
-            await dropChurchText(plainText, id, index)
+            try {
+                index = item ? JSON.parse(item).index : undefined
+            } catch {
+                /* append */
+            }
+            let quote: { text: string; source: string } | undefined
+            try {
+                const value = JSON.parse(e.dataTransfer?.getData("application/x-church-quote") || "null")
+                if (typeof value?.text === "string" && typeof value?.source === "string") quote = value
+            } catch {
+                /* external plain text */
+            }
+            await dropChurchText(quote?.text || plainText, id, index, quote?.source)
             return
         }
 

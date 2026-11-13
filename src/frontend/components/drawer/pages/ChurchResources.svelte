@@ -9,16 +9,24 @@
     import { loadShows } from "../../helpers/setShow"
     import { getSlideText } from "../../edit/scripts/textStyle"
     let readingId = ""
+    let chapterIndex = 0
+    let bookSearch = ""
+    $: chapters = reading?.churchBook?.sections || []
+    $: matchingChapters = chapters.map((chapter, index) => ({ ...chapter, index })).filter((chapter) => (chapter.title + " " + chapter.text).toLocaleLowerCase().includes(bookSearch.toLocaleLowerCase()))
     $: reading = $showsCache[readingId]
     async function read(id: string) {
         readingId = id
+        chapterIndex = 0
+        bookSearch = ""
         await loadShows([id])
     }
     function dragQuote(event: DragEvent) {
         const quote = window.getSelection()?.toString().trim()
         if (!quote || !reading) return
         selected.set({ id: null, data: [] })
-        event.dataTransfer?.setData("text/plain", quote + "\n\n" + (reading.meta.publisher || reading.name))
+        const source = chapters[chapterIndex]?.source || reading.meta.publisher || reading.name
+        event.dataTransfer?.setData("text/plain", quote + "\n\n" + source)
+        event.dataTransfer?.setData("application/x-church-quote", JSON.stringify({ text: quote, source }))
     }
     export let id: string
     export let searchValue = ""
@@ -27,7 +35,7 @@
         .filter(([id, show]) => show.category === category && (show.name + " " + JSON.stringify($textCache[id] || "")).toLocaleLowerCase().includes(searchValue.toLocaleLowerCase()))
         .map(([id, show]) => ({ ...show, id }))
     function importPackage() {
-        sendMain(Main.IMPORT, { channel: "church_package", format: { name: "Gemensam import · ZIP / JSON / text", extensions: ["zip", "json", "txt", "md"] } })
+        sendMain(Main.IMPORT, { channel: "church_package", format: { name: "Gemensam import · ZIP / JSON / text", extensions: ["zip", "json", "txt", "md", "epub", "usx"] } })
         activePopup.set(null)
     }
 </script>
@@ -48,11 +56,27 @@
     <article on:dragstart={dragQuote} style="padding:20px;max-width:900px;user-select:text;">
         <h2>{reading.name}</h2>
         <p>Markera ett utdrag och dra det till projektet eller bildspelet. Källan följer med.</p>
-        {#each Object.values(reading.slides) as slide}<p style="white-space:pre-wrap;line-height:1.6;">{getSlideText(slide)}</p>{/each}
+        {#if chapters.length}
+            <label>Sök i boken <input type="search" bind:value={bookSearch} placeholder="Ord eller mening" /></label>
+            <nav aria-label="Bokens kapitel" style="max-height:180px;overflow:auto;display:flex;flex-direction:column;">
+                {#each matchingChapters as chapter}
+                    <button class:chosen={chapter.index === chapterIndex} on:click={() => (chapterIndex = chapter.index)}>{chapter.index + 1}. {chapter.title}</button>
+                {/each}
+            </nav>
+            {#if !matchingChapters.length}<p>Inga kapitel matchar sökningen.</p>{/if}
+            <h3>{chapters[chapterIndex]?.title}</h3>
+            <p style="white-space:pre-wrap;line-height:1.7;">{chapters[chapterIndex]?.text}</p>
+            <small>{chapters[chapterIndex]?.source}</small>
+        {:else}
+            {#each Object.values(reading.slides) as slide}<p style="white-space:pre-wrap;line-height:1.6;">{getSlideText(slide)}</p>{/each}
+        {/if}
     </article>
 {/if}
 
 <style>
+    .chosen {
+        border-left: 3px solid #d6ba79;
+    }
     .tools {
         display: flex;
         gap: 8px;

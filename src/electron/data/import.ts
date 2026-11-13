@@ -1,3 +1,5 @@
+import fs from "fs/promises"
+import { prepareChurchEpub } from "./churchEpub"
 import { prepareChurchStyleFile } from "./churchStylePack"
 import Database from "better-sqlite3"
 import path, { join } from "path"
@@ -97,8 +99,15 @@ export async function importShow(id: string, files: string[] | null) {
         try {
             const data: FileData[] = []
             for (const file of files) {
-                if (file.toLowerCase().endsWith(".zip")) data.push(...await decompressZipStream(file, false, { maxEntries: 10000, maxUncompressedBytes: 256 * 1024 * 1024 }))
-                else data.push(await readFile(file))
+                if (file.toLowerCase().endsWith(".epub")) data.push(await prepareChurchEpub(await fs.readFile(file), path.basename(file)))
+                else if (file.toLowerCase().endsWith(".zip")) {
+                    const entries = await decompressZipStream(file, true, { maxEntries: 10000, maxUncompressedBytes: 256 * 1024 * 1024 })
+                    for (const entry of entries) {
+                        if (/(^|\/)(__MACOSX|\._|\.DS_Store)/.test(entry.name)) continue
+                        if (entry.extension === "epub") data.push(await prepareChurchEpub(Buffer.from(entry.content), entry.name))
+                        else data.push({ ...entry, content: entry.content.toString() })
+                    }
+                } else data.push(await readFile(file))
             }
             sendToMain(ToMain.IMPORT2, { channel: id, data: data.map(prepareChurchStyleFile) })
         } catch {
