@@ -1,0 +1,9 @@
+extends: config/building/electron-builder.yaml
+appId: se.nilssonmedia.churchshow.freeshow
+productName: Church Show FreeShow
+artifactName: Church-Show-FreeShow-${version}-Intel.${ext}
+afterSign: null
+publish: null
+mac:
+    identity: null
+    minimumSystemVersion: "12.0"
