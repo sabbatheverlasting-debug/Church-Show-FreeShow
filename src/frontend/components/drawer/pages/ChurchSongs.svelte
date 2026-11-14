@@ -9,12 +9,11 @@
     import SelectElem from "../../system/SelectElem.svelte"
     import ShowButton from "../../inputs/ShowButton.svelte"
     import ChurchAudioTools from "../audio/ChurchAudioTools.svelte"
-    import ChurchProgramBuilder from "./ChurchProgramBuilder.svelte"
+    import { openChurchPlanning } from "../../../utils/churchPlanning"
     export let searchValue = ""
     let files: { name: string; path: string; isFolder?: boolean }[] = []
     let message = "",
-        showAll = false,
-        planning = true
+        showAll = false
     $: library = Object.entries($shows)
         .filter(([, show]) => !["church_books", "church_questions", "church_cues", "church_studies"].includes(show.category || ""))
         .map(([id, show]) => ({ ...show, id }))
@@ -56,11 +55,11 @@
 </script>
 
 <div class="songs">
-    <div class="tools"><label><input type="checkbox" bind:checked={planning} /> Visa planeringen bredvid sångerna</label><label><input type="checkbox" bind:checked={showAll} /> Visa även övriga bildspel</label><button on:click={refresh}>Läs om ljudbiblioteket</button></div>
-    <p>Dra sången upp till ditt vanliga show-program eller till planeringen bredvid. Ljudkopplingen följer med. Dra en ljudfil till sången för att koppla eller byta ljud.</p>
+    <div class="tools"><button on:click={openChurchPlanning}>Öppna planering ovanför</button><label><input type="checkbox" bind:checked={showAll} /> Visa även övriga bildspel</label><button on:click={refresh}>Läs om ljudbiblioteket</button></div>
+    <p>Dra sången upp till ditt vanliga show-program eller till planeringen ovanför. Ljudkopplingen följer med. Dra en ljudfil till sången för att koppla eller byta ljud.</p>
     <ChurchAudioTools {files} />
     {#if message}<p role="status">{message}</p>{/if}
-    <div class="columns" class:planning>
+    <div class="columns">
         <div class="library">
             {#each songs as song (song.id)}
                 <div class="song" on:dragstart={(event) => drag(event, song.id)} on:dragover|preventDefault on:drop={(event) => dropAudio(event, song.id)}>
@@ -73,7 +72,6 @@
             {/each}
             {#if !songs.length}<p>Inga sånger matchar. Välj ”Visa även övriga bildspel” om sångerna ännu inte ligger i en sångkategori.</p>{/if}
         </div>
-        {#if planning}<div class="plan"><ChurchProgramBuilder /></div>{/if}
     </div>
 </div>
 
@@ -91,11 +89,8 @@
         display: grid;
         gap: 16px;
     }
-    .columns.planning {
-        grid-template-columns: minmax(220px, 1fr) minmax(300px, 1.3fr);
-    }
-    .library,
-    .plan {
+
+    .library {
         min-width: 0;
     }
     .song {
@@ -114,10 +109,5 @@
     audio {
         width: 100%;
         height: 32px;
-    }
-    @media (max-width: 700px) {
-        .columns.planning {
-            grid-template-columns: 1fr;
-        }
     }
 </style>

@@ -24,3 +24,8 @@ describe("programbyggare", () => {
         expect(() => buildChurchProgram({ title: "Sabbat", rows: [] }, {})).toThrow("minst en")
     })
 })
+
+it("keeps uploaded files as native project items in the chosen order", () => {
+    const project = buildChurchProgram({ title: "Studium", rows: [{ id: "pdf", kind: "study", resourceId: "", title: "", person: "Eva", notes: "Sida 3", file: { path: "/studium.pdf", name: "Studium.pdf", type: "pdf" } }] }, {})
+    expect(project.shows[1]).toEqual({ id: "/studium.pdf", name: "Studium.pdf", type: "pdf", notes: "Ansvarig: Eva\nSida 3" })
+})

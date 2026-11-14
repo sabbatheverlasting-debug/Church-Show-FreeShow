@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ChurchProgramBuilder from "./components/drawer/pages/ChurchProgramBuilder.svelte"
     import AiFloating from "./ai/components/floating/AiFloating.svelte"
     import { customActionActivation } from "./components/actions/actions"
     import DrawTabs from "./components/draw/DrawTabs.svelte"
@@ -37,26 +38,28 @@
         <Top {isWindows} />
     {/if}
     <div class="row">
-        <Resizeable id="leftPanel">
-            <div class="left">
-                {#if page === "show"}
-                    {#key $activeProfile}
-                        <Projects />
-                    {/key}
-                {:else if page === "edit"}
-                    <Navigation />
-                {:else if page === "stage"}
-                    <StageLayouts />
-                {:else if page === "draw"}
-                    <DrawTabs />
-                {:else if page === "settings"}
-                    <SettingsTabs />
-                {/if}
-            </div>
-        </Resizeable>
-
+        {#if page !== "planning"}<Resizeable id="leftPanel">
+                <div class="left">
+                    {#if page === "show"}
+                        {#key $activeProfile}
+                            <Projects />
+                        {/key}
+                    {:else if page === "edit"}
+                        <Navigation />
+                    {:else if page === "stage"}
+                        <StageLayouts />
+                    {:else if page === "draw"}
+                        <DrawTabs />
+                    {:else if page === "settings"}
+                        <SettingsTabs />
+                    {/if}
+                </div>
+            </Resizeable>
+        {/if}
         <div class="center">
-            {#if page === "show"}
+            {#if page === "planning"}
+                <ChurchProgramBuilder />
+            {:else if page === "show"}
                 {#if $focusMode}
                     <LazyLoad component={() => import("./components/show/focus/FocusMode.svelte")} show={$focusMode} />
                 {:else}
@@ -73,38 +76,39 @@
             {/if}
         </div>
 
-        <Resizeable id="rightPanel" let:width side="right">
-            <div class="right" class:row={width > DEFAULT_WIDTH * 1.8}>
-                <Preview />
-                {#if page === "show"}
-                    {#if $activeShow && ($activeShow.type === "show" || $activeShow.type === undefined) && !$focusMode}
-                        <ShowTools />
-                    {/if}
-                {:else if page === "edit"}
-                    {#if $activeEdit.type === "media" || $activeEdit.type === "camera"}
-                        <LazyLoad component={() => import("./components/edit/MediaTools.svelte")} show={$activeEdit.type === "media" || $activeEdit.type === "camera"} />
-                    {:else if $activeEdit.type === "audio"}
-                        <LazyLoad component={() => import("./components/edit/AudioTools.svelte")} show={$activeEdit.type === "audio"} />
-                    {:else if $activeEdit.type === "effect"}
-                        <LazyLoad component={() => import("./components/edit/EffectTools.svelte")} show={$activeEdit.type === "effect"} />
-                    {:else if $activeEdit.type === "scene"}
-                        <LazyLoad component={() => import("./components/edit/SceneTools.svelte")} show={$activeEdit.type === "scene"} />
-                    {:else if $activeEdit.type === "overlay" || $activeEdit.type === "template" || $showsCache[$activeShow?.id || ""]}
-                        {#if $focusMode || (($activeEdit.type || "show") === "show" && $editMode !== "default")}
-                            <!-- show nothing -->
-                        {:else}
-                            <LazyLoad component={() => import("./components/edit/EditTools.svelte")} show={!$focusMode} />
+        {#if page !== "planning"}<Resizeable id="rightPanel" let:width side="right">
+                <div class="right" class:row={width > DEFAULT_WIDTH * 1.8}>
+                    <Preview />
+                    {#if page === "show"}
+                        {#if $activeShow && ($activeShow.type === "show" || $activeShow.type === undefined) && !$focusMode}
+                            <ShowTools />
                         {/if}
+                    {:else if page === "edit"}
+                        {#if $activeEdit.type === "media" || $activeEdit.type === "camera"}
+                            <LazyLoad component={() => import("./components/edit/MediaTools.svelte")} show={$activeEdit.type === "media" || $activeEdit.type === "camera"} />
+                        {:else if $activeEdit.type === "audio"}
+                            <LazyLoad component={() => import("./components/edit/AudioTools.svelte")} show={$activeEdit.type === "audio"} />
+                        {:else if $activeEdit.type === "effect"}
+                            <LazyLoad component={() => import("./components/edit/EffectTools.svelte")} show={$activeEdit.type === "effect"} />
+                        {:else if $activeEdit.type === "scene"}
+                            <LazyLoad component={() => import("./components/edit/SceneTools.svelte")} show={$activeEdit.type === "scene"} />
+                        {:else if $activeEdit.type === "overlay" || $activeEdit.type === "template" || $showsCache[$activeShow?.id || ""]}
+                            {#if $focusMode || (($activeEdit.type || "show") === "show" && $editMode !== "default")}
+                                <!-- show nothing -->
+                            {:else}
+                                <LazyLoad component={() => import("./components/edit/EditTools.svelte")} show={!$focusMode} />
+                            {/if}
+                        {/if}
+                    {:else if page === "draw"}
+                        <LazyLoad component={() => import("./components/draw/DrawSettings.svelte")} show={page === "draw"} />
+                    {:else if page === "stage" && $activeStage.id}
+                        <LazyLoad component={() => import("./components/stage/StageTools.svelte")} show={page === "stage" && !!$activeStage.id} />
+                    {:else if page === "settings"}
+                        <LazyLoad component={() => import("./components/settings/SettingsTools.svelte")} show={page === "settings"} />
                     {/if}
-                {:else if page === "draw"}
-                    <LazyLoad component={() => import("./components/draw/DrawSettings.svelte")} show={page === "draw"} />
-                {:else if page === "stage" && $activeStage.id}
-                    <LazyLoad component={() => import("./components/stage/StageTools.svelte")} show={page === "stage" && !!$activeStage.id} />
-                {:else if page === "settings"}
-                    <LazyLoad component={() => import("./components/settings/SettingsTools.svelte")} show={page === "settings"} />
-                {/if}
-            </div>
-        </Resizeable>
+                </div>
+            </Resizeable>
+        {/if}
     </div>
 
     {#if page === "show" && $special.projectTimelineActive && $activeProject && !$projectView}
@@ -115,8 +119,8 @@
         </Resizeable>
     {/if}
 
-    {#if $loaded && (page === "show" || page === "edit")}
-        <LazyLoad component={() => import("./components/drawer/Drawer.svelte")} show={$loaded && (page === "show" || page === "edit")} />
+    {#if $loaded && (page === "show" || page === "edit" || page === "planning")}
+        <LazyLoad component={() => import("./components/drawer/Drawer.svelte")} show={$loaded && (page === "show" || page === "edit" || page === "planning")} />
     {/if}
 
     {#if $showChangeProfileMenu && $activeProfile !== null}

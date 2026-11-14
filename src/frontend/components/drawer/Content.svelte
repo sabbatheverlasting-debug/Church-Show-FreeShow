@@ -17,7 +17,7 @@
     import Timers from "./timers/Timers.svelte"
 
     import ChurchSongs from "./pages/ChurchSongs.svelte"
-    import ChurchProgramBuilder from "./pages/ChurchProgramBuilder.svelte"
+    import { openChurchPlanning } from "../../utils/churchPlanning"
     import ChurchResources from "./pages/ChurchResources.svelte"
 
     export let id: string
@@ -60,7 +60,7 @@
     {:else if id === "songs"}
         <ChurchSongs {searchValue} />
     {:else if id === "program_builder"}
-        <ChurchProgramBuilder />
+        <button on:click={openChurchPlanning}>Öppna planeringen i den övre arbetsytan</button>
     {:else if ["books", "questions", "cues"].includes(id)}
         <ChurchResources {id} {searchValue} />
     {:else if id === "media"}

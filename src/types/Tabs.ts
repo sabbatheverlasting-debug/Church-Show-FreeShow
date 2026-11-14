@@ -62,5 +62,5 @@ export interface DrawerTabs {
 
 export type DrawerTabIds = "songs" | "program_builder" | "books" | "questions" | "cues" | "shows" | "media" | "overlays" | "audio" | "scripture" | "calendar" | "timers" | "templates" | "functions"
 export type SettingsTabs = "general" | "files" | "display_settings" | "audio" | "styles" | "connection" | "profiles" | "theme" | "ai" | "other" // "calendar"
-export type TopViews = "show" | "edit" | "reflow" | "draw" | "stage" | "calendar" | "settings"
+export type TopViews = "planning" | "show" | "edit" | "reflow" | "draw" | "stage" | "calendar" | "settings"
 export type EditMode = "default" | "chords" | "text_edit"

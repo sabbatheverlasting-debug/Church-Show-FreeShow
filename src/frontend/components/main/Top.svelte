@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { openChurchPlanning } from "../../utils/churchPlanning"
+    import MaterialButton from "../inputs/MaterialButton.svelte"
     import { slide } from "svelte/transition"
     import { activeEdit, activePage, activeProfile, activeProject, activeShow, cloudUsers, dictionary, drawSettings, drawTool, os, outputDisplay, outputs, paintCache, profiles, saved, settingsTab, shows } from "../../stores"
     import { getCloudUsers } from "../../utils/cloudSync"
@@ -108,6 +110,7 @@
     </span>
     <span>
         <TopButton id="show" />
+        <MaterialButton isActive={$activePage === "planning"} on:click={openChurchPlanning}><Icon id="calendar" size={1.5} /><span>Planering</span></MaterialButton>
         <TopButton id="edit" disabled={editDisabled} />
         <TopButton id="stage" />
     </span>
