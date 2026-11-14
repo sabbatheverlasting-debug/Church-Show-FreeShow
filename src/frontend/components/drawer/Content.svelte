@@ -16,6 +16,7 @@
     import Variables from "./pages/Variables.svelte"
     import Timers from "./timers/Timers.svelte"
 
+    import ChurchSongs from "./pages/ChurchSongs.svelte"
     import ChurchProgramBuilder from "./pages/ChurchProgramBuilder.svelte"
     import ChurchResources from "./pages/ChurchResources.svelte"
 
@@ -56,6 +57,8 @@
 
     {#if id === "shows"}
         <Shows {active} {searchValue} bind:firstMatch />
+    {:else if id === "songs"}
+        <ChurchSongs {searchValue} />
     {:else if id === "program_builder"}
         <ChurchProgramBuilder />
     {:else if ["books", "questions", "cues"].includes(id)}

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { uid } from "uid"
     import { buildChurchProgram, type ProgramDraft, type ProgramRow } from "../../../../types/ChurchProgramBuilder"
-    import { activePage, activeProject, projectView, shows, special } from "../../../stores"
+    import { activePage, activeProject, projectView, selected, shows, special } from "../../../stores"
     import { history } from "../../helpers/history"
     let draft: ProgramDraft = $special.churchProgramDraft || { title: "", rows: [] }
     let message = ""
@@ -25,6 +25,16 @@
         draft = { ...draft, rows: draft.rows.filter((row) => row.id !== id) }
         created = false
     }
+    function dropSong(event: DragEvent) {
+        const id = event.dataTransfer?.getData("application/x-church-song")
+        if (!id || !$shows[id]) return
+        event.preventDefault()
+        event.stopPropagation()
+        draft = { ...draft, rows: [...draft.rows, { id: uid(), kind: "song", resourceId: id, title: "", person: "", notes: "" }] }
+        created = false
+        message = `”${$shows[id].name}” har lagts till i planeringen.`
+        selected.set({ id: null, data: [] })
+    }
     function create() {
         try {
             const project = buildChurchProgram(draft, $shows)
@@ -41,8 +51,9 @@
     }
 </script>
 
-<div class="builder">
+<div class="builder" on:dragover|preventDefault on:drop={dropSong}>
     <h2>Programbyggare</h2>
+    <div class="drop-hint">Släpp en sång här för att lägga till den i planeringen</div>
     <p>Välj sånger och färdiga studier från biblioteket och ange vem som gör vad. Programmet skapas som ett nytt project med hållpunkter i din ordning. Sångernas ljudkopplingar följer med.</p>
     <label>Programmets rubrik <input bind:value={draft.title} on:input={() => (created = false)} placeholder="Till exempel Sabbatsgudstjänst – Hopp" /></label>
     <div class="actions"><button on:click={() => add("song")}>+ Sång</button><button on:click={() => add("study")}>+ Studium / bildspel</button><button on:click={() => add("cue")}>+ Hållpunkt</button></div>
@@ -72,6 +83,12 @@
 </div>
 
 <style>
+    .drop-hint {
+        padding: 14px;
+        border: 2px dashed #d6ba79;
+        border-radius: 7px;
+        margin-bottom: 12px;
+    }
     .builder {
         padding: 20px;
         max-width: 1000px;
