@@ -28,7 +28,7 @@ export function installChurchStylePack(raw: any): number {
         if (typeof backgroundPath !== "string") throw new Error("Bakgrunden måste installeras genom Gemensam import.")
         history({
             id: "UPDATE",
-            newData: { data: { name: "Sång · " + bg.name, color: bg.accent, category: "song", settings: { resolution: { width: 1920, height: 1080 }, backgroundColor: bg.bottom, backgroundPath }, items: [{ style: "left:180px;top:160px;width:1560px;height:720px;font-family:Arial;text-align:center;", align: "center", textFit: "shrinkToFit", lines: [{ align: "center", text: [{ value: "Sångtext", style: `font-size:68px;color:${bg.text};font-weight:500;` }] }] }] } },
+            newData: { data: { name: "Sång · " + bg.name, color: bg.accent, category: "song", settings: { resolution: { width: 1920, height: 1080 }, backgroundColor: bg.bottom, backgroundPath, churchSongFooter: { text: bg.text, accent: bg.accent } }, items: [{ style: "left:180px;top:100px;width:1560px;height:730px;font-family:Arial;text-align:center;", align: "center", textFit: "shrinkToFit", lines: [{ align: "center", text: [{ value: "Sångtext", style: `font-size:68px;color:${bg.text};font-weight:500;` }] }] }] } },
             oldData: { id },
             location: { page: "drawer", id: "template" }
         })

@@ -24,7 +24,7 @@ jobs:
       - run: python -m pip install setuptools
       - run: npm ci
       - name: Church Show import tests
-        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchProgramBuilder.test.ts src/types/ChurchAudioMatch.test.ts src/electron/data/churchAudioFiles.test.ts src/types/ChurchCalendar.test.ts src/types/ChurchProjectMonths.test.ts src/electron/output/helpers/OutputDisplay.test.ts src/types/ChurchPackage.test.ts src/types/ChurchContentName.test.ts src/types/ChurchBible.test.ts src/types/ChurchUsx.test.ts src/types/ChurchEpub.test.ts src/electron/data/zip.test.ts src/types/ChurchStylePack.test.ts src/frontend/components/settings/tabs/churchThemes.test.ts src/frontend/utils/churchFolders.test.ts
+        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchSongFooter.test.ts src/types/ChurchProgramBuilder.test.ts src/types/ChurchAudioMatch.test.ts src/electron/data/churchAudioFiles.test.ts src/types/ChurchCalendar.test.ts src/types/ChurchProjectMonths.test.ts src/electron/output/helpers/OutputDisplay.test.ts src/types/ChurchPackage.test.ts src/types/ChurchContentName.test.ts src/types/ChurchBible.test.ts src/types/ChurchUsx.test.ts src/types/ChurchEpub.test.ts src/electron/data/zip.test.ts src/types/ChurchStylePack.test.ts src/frontend/components/settings/tabs/churchThemes.test.ts src/frontend/utils/churchFolders.test.ts
       - name: Unit tests (record upstream failures)
         continue-on-error: true
         run: npm run test:unit
@@ -38,6 +38,23 @@ jobs:
           npx vitest run --config config/testing/vitest.config.ts src/electron/cloud/syncManager.test.ts
       - run: npm run build
       - run: npx electron-builder --config config/building/church-show.yaml --mac dmg --x64 --publish never
+      - name: Scan packaged app before executing it
+        run: |
+          brew install clamav
+          mkdir -p /tmp/church-clamdb /tmp/church-scan
+          printf 'DatabaseDirectory /tmp/church-clamdb\nDatabaseMirror database.clamav.net\n' > /tmp/church-freshclam.conf
+          freshclam --config-file=/tmp/church-freshclam.conf
+          node node_modules/@electron/asar/bin/asar.js extract "dist/mac/Church Show Pro 2.app/Contents/Resources/app.asar" /tmp/church-scan
+          clamscan --database=/tmp/church-clamdb --recursive --infected --max-filesize=1024M --max-scansize=2048M --log=dist/security-scan.txt "dist/mac/Church Show Pro 2.app" /tmp/church-scan
+          shasum -a 256 dist/*.dmg > dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Church-Show-Security-Report
+          path: |
+            dist/security-scan.txt
+            dist/SHA256SUMS.txt
+          if-no-files-found: warn
       - name: Start the packaged Mac app
         run: node scripts/churchStartupSmoke.cjs
       - uses: actions/upload-artifact@v4

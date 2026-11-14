@@ -97,6 +97,7 @@ export interface Slide {
         template?: string
         background?: boolean
         color?: string
+        churchSongFooter?: { text: string; accent: string }
         backgroundImage?: string
         resolution?: Resolution
     }
@@ -564,6 +565,7 @@ export interface TemplateStyleOverride {
     templateId?: string
 }
 export interface TemplateSettings {
+    churchSongFooter?: { text: string; accent: string }
     mode?: "default" | "scripture" | "item" | "text"
     resolution?: Resolution
     backgroundColor?: string

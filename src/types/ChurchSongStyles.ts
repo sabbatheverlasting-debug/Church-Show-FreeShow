@@ -2,7 +2,7 @@ import type { ChurchStylePack } from "./ChurchStylePack"
 export const churchSongStyles: ChurchStylePack = {
   "format": "churchshow-style-pack",
   "version": 1,
-  "id": "sangstund-pro-v2",
+  "id": "sangstund-pro-v3",
   "name": "Sångstund Pro",
   "themes": [],
   "backgrounds": [

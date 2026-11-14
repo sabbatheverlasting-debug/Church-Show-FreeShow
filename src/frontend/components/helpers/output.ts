@@ -1,3 +1,4 @@
+import { churchSongFooterItems } from "../../../types/ChurchSongFooter"
 import { get } from "svelte/store"
 import { uid } from "uid"
 import { OUTPUT } from "../../../types/Channels"
@@ -1683,6 +1684,8 @@ function replaceScriptureValues(items: Item[], templateItems: Item[], customDyna
 export function updateSlideFromTemplate(slide: Slide, template: Template, isFirst = false, removeOverflow = false, firstTemplateId?: string) {
     const settings = template.settings || {}
     if (!slide.settings) slide.settings = {}
+    if (settings.churchSongFooter) slide.settings.churchSongFooter = { ...settings.churchSongFooter }
+    else delete slide.settings.churchSongFooter
 
     // if (settings.resolution || slide.settings.resolution) slide.settings.resolution = getResolution(settings.resolution)
     const firstTemplate = firstTemplateId ?? settings.firstSlideTemplate
@@ -2021,6 +2024,12 @@ const defaultMetadataItemStyle = "top: 910px;left: 30px;width: 1860px;height: 15
 const defaultMetadataTextStyle = "font-size: 30px;color: rgb(255 255 255 / 0.8);text-shadow: 2px 2px 4px rgb(0 0 0 / 80%);"
 export function getMetadata(show: Show | undefined, currentStyle: Styles, outSlide: OutSlide | null, _updater = get(templates)) {
     if (!show || !outSlide) return null
+
+    const slideRef = _show(outSlide.id).layouts([outSlide.layout]).ref()[0]?.[outSlide.index ?? -1]
+    const slide = show.slides?.[slideRef?.id || ""]
+    const songTemplateId = currentStyle.template || slide?.settings?.template || show.settings?.template
+    const footer = songTemplateId ? _updater[songTemplateId]?.settings?.churchSongFooter : slide?.settings?.churchSongFooter
+    if (footer && !slideRef?.data?.disabled) return churchSongFooterItems(show, footer)
 
     const showCategory = get(categories)[show.category || ""] || {}
     const metadataValues = currentStyle.metadata || showCategory.metadata || {}
