@@ -38,6 +38,8 @@ jobs:
           npx vitest run --config config/testing/vitest.config.ts src/electron/cloud/syncManager.test.ts
       - run: npm run build
       - run: npx electron-builder --config config/building/church-show.yaml --mac dmg --x64 --publish never
+      - name: Start the packaged Mac app
+        run: node scripts/churchStartupSmoke.cjs
       - uses: actions/upload-artifact@v4
         with:
           name: Church-Show-Pro-2-Intel-Monterey

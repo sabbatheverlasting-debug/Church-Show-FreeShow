@@ -156,6 +156,9 @@ async function startApp() {
 
     await setupStores()
 
+    // Optional Church services must load after the core store/file modules have initialized.
+    import("./data/churchCalendar").then(({ churchCalendar }) => churchCalendar()).catch(console.error)
+
     registerProtectedProtocol()
     cleanupProtectedCache().catch((err) => console.error("Protected cache cleanup failed:", err))
 
@@ -257,6 +260,7 @@ function mainWindowLoaded() {
     if (config.get("maximized")) maximizeMain()
 
     mainWindow?.show()
+    if (process.env.CHURCH_SHOW_STARTUP_SMOKE === "1" && process.env.FS_MOCK_STORE_PATH) console.info("CHURCH_SHOW_MAIN_WINDOW_READY")
     loadingWindow?.close()
 
     if (RECORD_STARTUP_TIME) console.timeEnd("Full startup")

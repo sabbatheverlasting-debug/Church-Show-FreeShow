@@ -46,5 +46,4 @@ export async function churchCalendar(data?: { action?: "status" | "enable" | "di
     const ips = Object.values(os.networkInterfaces()).flat().filter((entry) => entry && !entry.internal && entry.family === "IPv4").map((entry) => entry!.address)
     return { enabled: share.enabled && !!server?.listening, calendar: share.calendar, name: share.name, includeNotes: share.includeNotes, error, urls: server?.listening ? ips.map((ip) => `http://${ip}:${port}/calendar/${share.token}.ics`) : [] }
 }
-app.whenReady().then(() => churchCalendar()).catch(() => {})
 app.on("before-quit", () => server?.close())
