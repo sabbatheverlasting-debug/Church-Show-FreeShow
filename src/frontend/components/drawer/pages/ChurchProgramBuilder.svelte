@@ -19,9 +19,15 @@
     function blank(kind: ProgramRow["kind"]): ProgramRow {
         return { id: uid(), kind, resourceId: "", title: "", person: "", notes: "" }
     }
-    function add(kind: ProgramRow["kind"]) {
-        draft = { ...draft, rows: [...draft.rows, blank(kind)] }
+    function add(kind: ProgramRow["kind"], index = draft.rows.length) {
+        const rows = [...draft.rows]
+        rows.splice(index, 0, blank(kind))
+        draft = { ...draft, rows }
         created = false
+    }
+    function insert(event: MouseEvent, index: number, kind: ProgramRow["kind"]) {
+        ;(event.currentTarget as HTMLElement).closest("details")?.removeAttribute("open")
+        add(kind, index + 1)
     }
     function put(content: Partial<ProgramRow>, target?: string) {
         if (target) draft = { ...draft, rows: draft.rows.map((row) => (row.id === target ? { ...row, resourceId: "", file: undefined, text: undefined, ...content } : row)) }
@@ -213,6 +219,10 @@
                     >
                 {/if}
                 <label>Anteckningar för ledaren<textarea bind:value={row.notes} rows="2" placeholder="Visas inte som egen text på projektorn"></textarea></label>
+                <details class="insert-point">
+                    <summary aria-label={`Lägg till en ny programpunkt efter punkt ${index + 1}`}>＋ Lägg till efter denna punkt</summary>
+                    <div class="actions"><button on:click={(event) => insert(event, index, "song")}>Sång</button><button on:click={(event) => insert(event, index, "study")}>Studium / text / fil</button><button on:click={(event) => insert(event, index, "cue")}>Hållpunkt</button></div>
+                </details>
                 <div class="actions"><button disabled={index === 0} on:click={() => move(index, -1)}>↑ Upp</button><button disabled={index === draft.rows.length - 1} on:click={() => move(index, 1)}>↓ Ned</button><button on:click={() => remove(row.id)}>Ta bort punkt</button></div>
             </fieldset>
         {/each}
@@ -323,6 +333,16 @@
     .create {
         border-color: #d6ba79;
         white-space: nowrap;
+    }
+    .insert-point {
+        margin-top: 12px;
+        padding: 8px 12px;
+        border: 1px dashed #d6ba79;
+        border-radius: 6px;
+    }
+    .insert-point summary {
+        cursor: pointer;
+        font-weight: 600;
     }
     .message {
         white-space: pre-wrap;
