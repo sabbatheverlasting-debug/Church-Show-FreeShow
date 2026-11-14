@@ -24,7 +24,7 @@ jobs:
       - run: python -m pip install setuptools
       - run: npm ci
       - name: Church Show import tests
-        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchPackage.test.ts src/types/ChurchContentName.test.ts src/types/ChurchBible.test.ts src/types/ChurchUsx.test.ts src/types/ChurchEpub.test.ts src/electron/data/zip.test.ts src/types/ChurchStylePack.test.ts src/frontend/components/settings/tabs/churchThemes.test.ts src/frontend/utils/churchFolders.test.ts
+        run: npx vitest run --config config/testing/vitest.config.ts src/types/ChurchProgramBuilder.test.ts src/types/ChurchAudioMatch.test.ts src/electron/data/churchAudioFiles.test.ts src/types/ChurchCalendar.test.ts src/types/ChurchProjectMonths.test.ts src/electron/output/helpers/OutputDisplay.test.ts src/types/ChurchPackage.test.ts src/types/ChurchContentName.test.ts src/types/ChurchBible.test.ts src/types/ChurchUsx.test.ts src/types/ChurchEpub.test.ts src/electron/data/zip.test.ts src/types/ChurchStylePack.test.ts src/frontend/components/settings/tabs/churchThemes.test.ts src/frontend/utils/churchFolders.test.ts
       - name: Unit tests (record upstream failures)
         continue-on-error: true
         run: npm run test:unit
@@ -47,5 +47,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Church-Show-Sangstund-Temapaket
-          path: packages/Church-Show-Sangstund-1.zip
+          path: packages/Church-Show-Sangstund-Pro-2.zip
           if-no-files-found: error

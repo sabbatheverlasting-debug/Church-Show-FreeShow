@@ -28,6 +28,10 @@ export enum Main {
     LOG = "LOG",
     IS_DEV = "IS_DEV",
     GET_CACHE_PATH = "GET_CACHE_PATH",
+    CHURCH_AUDIO_FILES = "CHURCH_AUDIO_FILES",
+    CHURCH_QUIZ = "CHURCH_QUIZ",
+    CHURCH_CALENDAR = "CHURCH_CALENDAR",
+    CHURCH_SONG_STYLES = "CHURCH_SONG_STYLES",
     // APP
     VERSION = "VERSION",
     GET_OS = "GET_OS",
@@ -196,6 +200,9 @@ export enum Main {
 }
 
 export interface MainSendPayloads {
+    [Main.CHURCH_QUIZ]: { action: "start" | "questions" }
+    [Main.CHURCH_AUDIO_FILES]: { paths?: string[]; remove?: string; keep?: string }
+    [Main.CHURCH_CALENDAR]: { action?: "status" | "enable" | "disable"; calendar?: string; name?: string; includeNotes?: boolean }
     // DEV
     [Main.LOG]: any
     /////
@@ -343,6 +350,10 @@ export interface MainReturnPayloads {
     [Main.BIBLE]: { id: string; error?: string; content?: [string, Bible] }
     [Main.SHOW]: { id: string; error?: string; content?: [string, Show] }
     ///
+    [Main.CHURCH_AUDIO_FILES]: any
+    [Main.CHURCH_QUIZ]: any
+    [Main.CHURCH_CALENDAR]: any
+    [Main.CHURCH_SONG_STYLES]: any
     [Main.GET_DISPLAYS]: Display[]
     [Main.GET_PATHS]: MainFilePaths
     [Main.DATA_PATH]: string

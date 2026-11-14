@@ -1,3 +1,4 @@
+import { installChurchStylePack } from "../converters/churchStylePack"
 import { resetDefaultBackground } from "../utils/churchFolders"
 import { importChurchPackages } from "../converters/churchPackage"
 import { get } from "svelte/store"
@@ -99,7 +100,7 @@ import { invalidateSearchIndex } from "../utils/searchFast"
 import { updateSettings, updateSyncedSettings, updateThemeValues } from "../utils/updateSettings"
 import type { MainReturnPayloads } from "./../../types/IPC/Main"
 import { Main } from "./../../types/IPC/Main"
-import { sendMain } from "./main"
+import { requestMain, sendMain } from "./main"
 
 type MainHandler<ID extends Main | ToMain> = (data: ID extends keyof ToMainSendPayloads ? ToMainSendPayloads[ID] : ID extends keyof MainReturnPayloads ? Awaited<MainReturnPayloads[ID]> : undefined) => void
 export type MainResponses = {
@@ -138,7 +139,11 @@ export const mainResponses: MainResponses = {
         projectTemplates.set(a.projectTemplates || {})
     },
     [Main.OVERLAYS]: (a) => overlays.set(a),
-    [Main.TEMPLATES]: (a) => templates.set(resetDefaultBackground(a, true)),
+    [Main.TEMPLATES]: async (a) => {
+        templates.set(resetDefaultBackground(a, true))
+        const pack = await requestMain(Main.CHURCH_SONG_STYLES)
+        if (pack) installChurchStylePack(pack)
+    },
     [Main.EVENTS]: (a) => events.set(a),
     [Main.MEDIA]: (a) => media.set(a),
     [Main.THEMES]: (a) => {

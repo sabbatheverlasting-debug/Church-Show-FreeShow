@@ -9,7 +9,7 @@
     import ShowsTabs from "./navigation/ShowsTabs.svelte"
     import TemplatesTabs from "./navigation/TemplatesTabs.svelte"
 
-    export let id: "books" | "questions" | "cues" | "shows" | "media" | "overlays" | "audio" | "effects" | "scripture" | "calendar" | "functions" | "templates" | "timers"
+    export let id: "program_builder" | "books" | "questions" | "cues" | "shows" | "media" | "overlays" | "audio" | "effects" | "scripture" | "calendar" | "functions" | "templates" | "timers"
 </script>
 
 <div class="main">

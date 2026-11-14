@@ -20,8 +20,7 @@ export function installChurchStylePack(raw: any): number {
         })
         count++
     }
-    theme.set(currentTheme)
-    updateThemeValues(get(themes)[currentTheme])
+    if (pack.themes.length) { theme.set(currentTheme); updateThemeValues(get(themes)[currentTheme]) }
     for (const bg of pack.backgrounds) {
         const id = `church_${pack.id}_${bg.id}`
         if (get(templates)[id]) continue
@@ -29,7 +28,7 @@ export function installChurchStylePack(raw: any): number {
         if (typeof backgroundPath !== "string") throw new Error("Bakgrunden måste installeras genom Gemensam import.")
         history({
             id: "UPDATE",
-            newData: { data: { name: "Sång · " + bg.name, color: bg.accent, category: "song", settings: { resolution: { width: 1920, height: 1080 }, backgroundColor: bg.bottom, backgroundPath }, items: [{ style: "left:120px;top:130px;width:1680px;height:780px;font-family:Arial;text-align:center;", align: "center", textFit: "shrinkToFit", lines: [{ align: "center", text: [{ value: "Sångtext", style: `font-size:64px;color:${bg.text};` }] }] }] } },
+            newData: { data: { name: "Sång · " + bg.name, color: bg.accent, category: "song", settings: { resolution: { width: 1920, height: 1080 }, backgroundColor: bg.bottom, backgroundPath }, items: [{ style: "left:180px;top:160px;width:1560px;height:720px;font-family:Arial;text-align:center;", align: "center", textFit: "shrinkToFit", lines: [{ align: "center", text: [{ value: "Sångtext", style: `font-size:68px;color:${bg.text};font-weight:500;` }] }] }] } },
             oldData: { id },
             location: { page: "drawer", id: "template" }
         })

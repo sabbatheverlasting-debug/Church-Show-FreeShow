@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ChurchCalendarShare from "./ChurchCalendarShare.svelte"
     import { activeDays, activePopup, calendars, eventEdit, events, labelsDisabled, popupData, special } from "../../../stores"
     import { translateText } from "../../../utils/language"
     import { actionData } from "../../actions/actionData"
@@ -205,6 +206,7 @@
     }
 </script>
 
+<ChurchCalendarShare />
 <div class="calendar">
     <div class="week" style="flex: 1;">
         <div class="weekday" style="min-width: 25px;flex: 1;padding: 0;background-color: var(--primary-darker);font-size: 0.9em;opacity: 0.7;font-weight: 600;">

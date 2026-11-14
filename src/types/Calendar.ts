@@ -1,4 +1,5 @@
 export interface Event {
+    churchProjectId?: string
     id?: string
     type: "event" | "action" | "show" | "timer"
     name: string

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09254c"><title>Frågeverkstad – Bibel Frågesport</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#eff5ff;background:#06172e}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 35% 0,#17518e,#081d3d 55%,#06152c);padding:16px}
+main{max-width:1120px;margin:auto}header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:12px 0 25px}
+a{color:#f8da96}header a{font-size:.92rem}h1,h2{font-family:Georgia,serif;color:#ffe4a1}h1{font-size:clamp(1.8rem,5vw,2.8rem);margin:0}h2{font-size:1.2rem;margin:0 0 12px}
+p{line-height:1.5}.muted{color:#bbcee6}.small{font-size:.87rem}.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,.75fr);gap:16px}.panel{border:1px solid #b58d49;background:#0a2956e8;border-radius:19px;padding:19px;margin:14px 0;box-shadow:0 12px 30px #0005}
+label{font-weight:700;font-size:.9rem;display:block;margin:12px 0 5px;color:#e2ebfb}
+input,select,textarea{width:100%;border:1px solid #749dcd;background:#071a38;color:#fff;border-radius:10px;padding:12px;font:inherit;min-height:46px}
+textarea{min-height:100px;resize:vertical}button,.button{display:inline-flex;justify-content:center;align-items:center;gap:6px;min-height:46px;background:linear-gradient(#ffe8ac,#d3a044);border:1px solid #ffe1a1;color:#2b230e;font-weight:800;padding:12px 16px;border-radius:12px;cursor:pointer;text-decoration:none}
+button.secondary{background:#173c72;color:#fff2d5;border-color:#829bc1}button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1 1 auto}
+.status{padding:10px 12px;border-radius:12px;background:#071b3d;color:#e8ddbd}
+.status:empty{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.preview{background:#f8efd2;border:6px double #cba453;border-radius:20px;padding:22px;color:#1b3153;text-align:center;box-shadow:0 8px 25px #0006}
+.preview .number{font-size:.85rem;color:#795b2a;margin:0 0 10px}.preview h3{font:bold clamp(1.2rem,2.7vw,2rem)/1.33 Georgia,serif;margin:5px 0 18px;color:#163258;overflow-wrap:anywhere}
+.option{display:flex;align-items:center;gap:10px;border-radius:12px;border:1px solid #b5a078;background:#fffaf0;margin:8px 0;padding:12px;text-align:left;overflow-wrap:anywhere}
+.option b{background:#144677;color:white;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;flex-shrink:0}
+.note{font-size:.85rem;color:#294a6b;margin-top:12px}.ok{color:#bbf7d1}
+[hidden]{display:none!important}
+@media(max-width:830px){.grid{grid-template-columns:1fr}.pair{grid-template-columns:1fr}body{padding:10px}.panel{padding:14px}}
+</style>
+</head>
+<body><main>
+<header><div><h1>📖 Frågeverkstad</h1><p class="muted">Från inskannade bokfrågor till Bibel Frågesport</p></div><a href="/">← Till spelet</a></header>
+<section class="panel"><h2>1. Läs in ditt JSON-paket</h2>
+<p class="muted">Stöder vanliga färdiga quizfiler och källpaket med <code>questions</code>, <code>correct_answer</code>, <code>answer_options</code> och <code>scripture_reference</code>. Ofullständiga frågor sparas som utkast och spelas inte innan de granskats.</p>
+<input id="jsonFile" type="file" accept=".json,application/json" aria-label="Välj JSON-fil">
+<div id="overview" class="status" role="status" aria-live="polite">Välj din JSON-fil ovan. Tidigare utkast kan återställas nedan.</div>
+<div class="row" style="margin-top:12px"><button id="restore" class="secondary">Återställ sparat utkast</button><button id="exportDraft" class="secondary" disabled>⬇ Spara alla utkast</button><button id="exportReady" class="secondary" disabled>⬇ Exportera färdiga frågor</button></div>
+</section>
+<div id="workspace" hidden>
+<div class="row"><button id="prev" class="secondary">← Föregående</button><select id="jump" aria-label="Välj fråga"></select><button id="next" class="secondary">Nästa →</button></div>
+<div class="grid">
+<section class="panel"><h2>2. Kontrollera frågan och facit</h2>
+<label for="question">Fråga</label><textarea id="question"></textarea>
+<div class="pair"><div><label for="number">Originalnummer</label><input id="number" readonly></div><div><label for="quiz">Ursprunglig quizgrupp</label><input id="quiz" readonly></div></div>
+<p class="muted small">Skriv ett rätt svar och minst ett felaktigt alternativ. Fyra alternativ rekommenderas. Endast du ser facit innan det avslöjas.</p>
+<div class="pair"><div><label for="opt0">A · Alternativ</label><input id="opt0"></div><div><label for="opt1">B · Alternativ</label><input id="opt1"></div><div><label for="opt2">C · Alternativ</label><input id="opt2"></div><div><label for="opt3">D · Alternativ</label><input id="opt3"></div></div>
+<label for="answer">Rätt alternativ</label><select id="answer"><option value="">Välj rätt svar först efter kontroll</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>
+<div class="pair"><div><label for="reference">Bibelhänvisning</label><input id="reference" placeholder="t.ex. 1 Moseboken 6:14"></div><div><label for="difficulty">Svårighetsgrad</label><select id="difficulty"><option value="easy">Lätt</option><option value="medium">Medel</option><option value="hard">Svår</option></select></div>
+<div class="row" style="margin-top:18px"><button id="approve">✓ Godkänn frågan</button><button id="skip" class="secondary">Hoppa till nästa</button></div><div id="quality" class="status" aria-live="polite"></div>
+</section>
+<section class="panel"><h2>3. Förhandsgranska TV-frågan</h2><div class="preview"><div id="cardNumber" class="number"></div><h3 id="cardQuestion"></h3><div id="cardOptions"></div><p class="note">Alternativen visas på TV först när spelledaren trycker på knappen.</p></div><p class="muted small">Detta är en förhandsvisning, inte en ändring av den pågående spelomgången.</p></section>
+</div>
+<section class="panel"><h2>4. Lägg in godkända frågor i spelet</h2>
+<p class="muted">Bara godkända och kompletta frågor förs över. Om rätt svar, tydliga alternativ eller bibelkontroll saknas stannar frågan som utkast.</p><div class="row"><button id="send">✓ Importera godkända till spelbanken</button><button id="findUnfinished" class="secondary">Visa nästa ofärdiga</button></div><div id="sendStatus" class="status" aria-live="polite"></div>
+</section>
+</div>
+</main>
+<script>
+"use strict";
+(function(){
+var key="bible-trivia-workshop-v1", rows=[],position=0;
+var $=function(id){return document.getElementById(id);};
+var clean=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim();};
+function showError(e){$("overview").textContent="⚠ "+String(e&&e.message||e);}
+function canStore(){try{localStorage.setItem(key,JSON.stringify({rows:rows,position:position}));return true;}catch(e){$("overview").textContent="⚠ Lagringen är full eller blockerad – exportera dina utkast så att inget går förlorat.";return false;}}
+function readData(text){
+ var obj=JSON.parse(String(text).replace(/^\uFEFF/,""));
+ var list=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.questions)?obj.questions:null);
+ if(!list)throw Error("JSON-filen måste innehålla en lista eller ett questions-fält.");
+ var seen={};
+ return list.filter(function(q){return q&&typeof q==="object"&&clean(q.question||q.fraga||q.fråga);}).map(function(q,i){
+ var text=clean(q.question||q.fraga||q.fråga), k=text.toLocaleLowerCase();
+ if(seen[k])return null;seen[k]=true;
+ var choices=q.answer_options||q.options||q.choices||q.alternativ||[];
+ if(!Array.isArray(choices))choices=["A","B","C","D"].map(function(letter){return choices[letter]||"";});
+ choices=choices.slice(0,4).map(clean);
+ while(choices.length<4)choices.push("");
+ var supplied=q.answer==null?(q.correct_answer==null?q.correctAnswer:q.correct_answer):q.answer;
+ var answer="";
+ if(typeof supplied==="number"&&supplied>=0&&supplied<4)answer="ABCD"[supplied];
+ else if(typeof supplied==="string"){
+   var val=clean(supplied),idx=choices.findIndex(function(v){return v&&v.toLowerCase()===val.toLowerCase();});
+   if(idx>=0)answer="ABCD"[idx];
+   else if(/^[A-D]$/i.test(val))answer=val.toUpperCase();
+   else if(val&&!choices[0]){choices[0]=val;answer="A";}
+ }
+ return {id:clean(q.id)||"question-"+(q.number||i+1),number:q.number||i+1,quiz:clean(q.quiz||q.category||""),
+ question:text,options:choices,answer:answer,reference:clean(q.scripture_reference||q.reference||""),
+ difficulty:/^(easy|medium|hard)$/.test(q.difficulty)?q.difficulty:"medium",approved:!!q.approved&&!!answer};
+ }).filter(Boolean);
+}
+function check(r){
+ if(!r||!clean(r.question))return "Frågetext saknas.";
+ var chosen=r.options.map(clean).filter(Boolean);
+ if(chosen.length<2)return "Skriv minst två svarsalternativ.";
+ if(chosen.some(function(v){return v.length>250;}))return "Ett svarsalternativ är för långt.";
+ if(new Set(chosen.map(function(v){return v.toLocaleLowerCase();})).size!==chosen.length)return "Två svarsalternativ är identiska.";
+ if(!/^[A-D]$/.test(r.answer||""))return "Välj vilket svar som är rätt.";
+ if(!clean(r.options["ABCD".indexOf(r.answer)]))return "Det valda rätta alternativet är tomt.";
+ if(!clean(r.reference))return "Lägg gärna till bibelhänvisning (krävs för godkännande).";
+ return "";
+}
+function ready(r){return !!r.approved&&!check(r);}
+function progress(){
+ var done=rows.filter(ready).length;
+ $("overview").textContent=rows.length+" frågor inlästa · "+done+" godkända · "+(rows.length-done)+" kvar att granska. Utkast sparas lokalt i denna webbläsare.";
+ $("workspace").hidden=!rows.length;
+ $("exportDraft").disabled=!rows.length;
+ $("exportReady").disabled=!done;
+ $("send").disabled=!done;
+ $("prev").disabled=position===0;$("next").disabled=position>=rows.length-1;
+ var list=$("jump"),old=list.value;list.replaceChildren();
+ rows.forEach(function(r,i){var item=document.createElement("option");item.value=i;item.textContent=(ready(r)?"✓ ":"○ ")+String(r.number)+" · "+r.question.slice(0,50);list.appendChild(item);});
+ list.value=String(position);
+}
+function preview(r){
+ $("cardNumber").textContent=clean(r.quiz||"Bibel Frågesport")+" · Fråga "+r.number;
+ $("cardQuestion").textContent=r.question||"Frågan visas här";
+ var host=$("cardOptions");host.replaceChildren();
+ r.options.forEach(function(option,i){if(!clean(option))return;
+   var line=document.createElement("div"),badge=document.createElement("b"),label=document.createElement("span");
+   line.className="option";badge.textContent="ABCD"[i];label.textContent=option;
+   line.appendChild(badge);line.appendChild(label);host.appendChild(line);
+ });
+}
+function display(){
+ if(!rows.length){progress();return;}
+ var r=rows[position];
+ $("question").value=r.question;$("number").value=r.number;$("quiz").value=r.quiz;
+ for(var i=0;i<4;i++)$("opt"+i).value=r.options[i]||"";
+ $("answer").value=r.answer||"";$("reference").value=r.reference||"";$("difficulty").value=r.difficulty;
+ $("quality").textContent=ready(r)?"✓ Kontrollerad och godkänd.":check(r)||"Klar för godkännande.";
+ $("approve").disabled=!!check(r);progress();preview(r);
+}
+function capture(){
+ if(!rows.length)return;
+ var r=rows[position],before=JSON.stringify([r.question,r.options,r.answer,r.reference,r.difficulty]);
+ r.question=clean($("question").value);
+ r.options=[0,1,2,3].map(function(i){return clean($("opt"+i).value);});
+ r.answer=$("answer").value;r.reference=clean($("reference").value);r.difficulty=$("difficulty").value;
+ if(JSON.stringify([r.question,r.options,r.answer,r.reference,r.difficulty])!==before)r.approved=false;
+ $("quality").textContent=ready(r)?"✓ Kontrollerad och godkänd.":check(r)||"Klar för godkännande.";
+ $("approve").disabled=!!check(r);preview(r);canStore();
+}
+function go(index){capture();position=Math.max(0,Math.min(rows.length-1,index));display();canStore();}
+function exportFile(name,value){
+ var blob=new Blob([JSON.stringify(value,null,2)],{type:"application/json;charset=utf-8"});
+ var url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(url);},1500);
+}
+function asGame(q){return {question:q.question,options:q.options.filter(Boolean),answer:q.answer,reference:q.reference,difficulty:q.difficulty,category:q.quiz||"Gamla testamentet"};}
+function prepared(){
+ return rows.filter(ready).map(function(q){var index="ABCD".indexOf(q.answer),trim=q.options.slice(0);
+ // Keep the correct option's original position if some optional fields are blank.
+ var used=trim.map(function(v,i){return {text:clean(v),i:i};}).filter(function(v){return v.text;});
+ var target=used.findIndex(function(v){return v.i===index;});
+ var out=asGame(q);out.options=used.map(function(v){return v.text;});out.answer="ABCDEF"[target];return out;
+ });
+}
+$("jsonFile").addEventListener("change",async function(e){
+ var file=e.target.files&&e.target.files[0];if(!file)return;
+ try{
+ var list=readData(await file.text());if(!list.length)throw Error("Inga frågor hittades.");
+ // Merge on source question, so additional packs can be loaded without losing editing.
+ var old=new Set(rows.map(function(q){return q.question.toLocaleLowerCase();}));
+ var added=0;list.forEach(function(q){if(!old.has(q.question.toLocaleLowerCase())){rows.push(q);old.add(q.question.toLocaleLowerCase());added++;}});
+ position=added?rows.length-added:Math.min(position,rows.length-1);canStore();display();
+ $("sendStatus").textContent="✓ "+added+" nya frågor från "+file.name+". Kontrollera facit och alternativ innan import.";
+ }catch(err){showError(err);}
+ e.target.value="";
+});
+$("restore").onclick=function(){try{var obj=JSON.parse(localStorage.getItem(key)||"null");if(!obj||!Array.isArray(obj.rows)||!obj.rows.length)throw Error("Inga sparade utkast hittades.");rows=obj.rows;position=Math.min(rows.length-1,Number(obj.position)||0);display();}catch(e){showError(e);}};
+$("exportDraft").onclick=function(){capture();exportFile("Bible-Trivia-alla-utkast.json",{schema:"bible-trivia.workshop.v1",questions:rows,savedAt:new Date().toISOString()});};
+$("exportReady").onclick=function(){capture();exportFile("Bible-Trivia-godkanda-fragor.json",{questions:prepared()});};
+["question","opt0","opt1","opt2","opt3","answer","reference","difficulty"].forEach(function(id){$(id).addEventListener("input",capture);$(id).addEventListener("change",capture);});
+$("prev").onclick=function(){go(position-1);};$("next").onclick=function(){go(position+1);};
+$("jump").onchange=function(){go(Number(this.value));};
+$("approve").onclick=function(){capture();var r=rows[position],problem=check(r);if(problem){$("quality").textContent=problem;return;}r.approved=true;canStore();progress();$("quality").textContent="✓ Fråga "+r.number+" är godkänd.";};
+$("skip").onclick=function(){go(position+1);};
+$("findUnfinished").onclick=function(){if(!rows.length)return;var i=rows.findIndex(function(r,j){return j>position&&!ready(r);});if(i<0)i=rows.findIndex(function(r){return !ready(r);});if(i>=0)go(i);};
+$("send").onclick=async function(){
+ capture();var questionBank=prepared();
+ if(!questionBank.length){$("sendStatus").textContent="Inga färdiga frågor att importera.";return;}
+ var code=localStorage.getItem("quiz-hostCode")||localStorage.getItem("quiz-code"),token=localStorage.getItem("quiz-token");
+ if(!/^\d{6}$/.test(code||"")||!token){$("sendStatus").textContent="Öppna Frågeverkstaden från en aktiv spelledare på denna enhet. Du kan även exportera färdiga frågor och importera dem i vanliga importvyn.";return;}
+ $("send").disabled=true;try{
+ var total=0,duplicate=0,errors=[];
+ for(var i=0;i<questionBank.length;i+=200){
+  var response=await fetch("/api/rooms/"+code+"/import",{method:"POST",headers:{"Content-Type":"application/json","X-Host-Token":token},body:JSON.stringify({questions:questionBank.slice(i,i+200)})});
+  var result=await response.json();if(!response.ok)throw Error(result.error||"HTTP "+response.status);
+  total+=result.added||0;duplicate+=result.skipped||0;if(result.errors)errors=errors.concat(result.errors);
+ }
+ $("sendStatus").textContent="✓ "+total+" frågor importerade · "+duplicate+" fanns redan · "+errors.length+" avvisade. "+errors.slice(0,3).join("; ");
+ }catch(e){$("sendStatus").textContent="⚠ "+String(e.message||e)+" – inget utkast har raderats."; }finally{progress();}
+};
+try{if(localStorage.getItem(key))$("overview").textContent="Sparat utkast finns. Välj Återställ sparat utkast eller öppna en ny JSON-fil.";}catch(_e){}
+})();
+</script></body></html>

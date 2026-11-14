@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="quiz-build" content="1.5.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071a43">
+  <meta name="description" content="Bibel Frågesport – styr från mobilen, spela tillsammans framför TV:n">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <title>Bibel Frågesport</title>
+</head>
+<body>
+  <div id="app"><div class="loading" role="status">Bibel Frågesport startar… (v1.5.0)</div></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script>
+(function () {
+  var firstError = "";
+  window.showQuizStartupError = function (message) {
+    var holder = document.getElementById("app");
+    if (!holder || document.documentElement.dataset.appStarted === "true") return;
+    holder.innerHTML = "";
+    var box = document.createElement("section");
+    box.style.cssText = "max-width:540px;margin:70px auto;padding:24px;border-radius:22px;background:#112954;color:#fff;text-align:center;font:18px system-ui";
+    var title = document.createElement("h2");
+    title.textContent = "Kunde inte starta Bibel Frågesport (v1.5.0)";
+    var detail = document.createElement("p");
+    detail.textContent = message || "Ett fel inträffade vid start.";
+    detail.style.cssText = "font-size:15px;line-height:1.5;overflow-wrap:anywhere";
+    var help = document.createElement("p");
+    help.textContent = "Ta en bild av detta felmeddelande. Ta inte bort appen eller rensa dess data.";
+    help.style.cssText = "font-size:14px;opacity:.85";
+    var retry = document.createElement("button");
+    retry.textContent = "↻ Försök igen – v1.5.0";
+    retry.style.cssText = "padding:14px 24px;background:#f5c85d;border:0;border-radius:14px;color:#08204b;font-weight:bold;font-size:18px";
+    retry.onclick = function () { location.reload(); };
+    box.appendChild(title); box.appendChild(detail); box.appendChild(help); box.appendChild(retry);
+    holder.appendChild(box);
+  };
+  window.addEventListener("error", function (event) {
+    if (!firstError) firstError = event.message || ("Resursfel: " + (event.target && event.target.src || ""));
+  }, true);
+  window.addEventListener("unhandledrejection", function (event) {
+    if (!firstError) firstError = String(event.reason || "Okänt JavaScript-fel");
+  });
+  setTimeout(function () {
+    if (document.documentElement.dataset.appStarted !== "true") {
+      window.showQuizStartupError(firstError || "Webbläsaren kunde inte ladda spelets startkod. Kontrollera att appens filer finns.");
+    }
+  }, 7000);
+})();
+</script>
+  <script src="/sound.js?v=15000" defer></script>
+  <script src="/import-utils.js?v=15000" defer></script>
+  <script src="/bible-import.js" defer></script>
+  <script src="/app.js?v=15000" defer></script>
+</body>
+</html>
+

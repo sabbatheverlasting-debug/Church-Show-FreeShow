@@ -1,3 +1,8 @@
+import { churchQuiz } from "../data/churchQuiz"
+import { churchAudioFiles } from "../data/churchAudioFiles"
+import { churchCalendar } from "../data/churchCalendar"
+import { prepareChurchStyleFile } from "../data/churchStylePack"
+import { churchSongStyles } from "../../types/ChurchSongStyles"
 import * as Sentry from "@sentry/electron/main"
 import type { BrowserWindow, DesktopCapturerSource } from "electron"
 import { app, desktopCapturer, screen, shell, systemPreferences } from "electron"
@@ -84,6 +89,10 @@ export const mainResponses: MainResponses = {
     [Main.SAVE]: (a) => save(a),
     [Main.BACKUPS]: () => getBackups(),
     [Main.DELETE_BACKUP]: (data) => deleteBackup(data),
+    [Main.CHURCH_AUDIO_FILES]: (data) => churchAudioFiles(data),
+    [Main.CHURCH_QUIZ]: (data) => churchQuiz(data),
+    [Main.CHURCH_CALENDAR]: (data) => churchCalendar(data),
+    [Main.CHURCH_SONG_STYLES]: () => JSON.parse(String(prepareChurchStyleFile({ extension: "json", content: JSON.stringify(churchSongStyles) }).content)),
     [Main.IMPORT]: (data) => startImport(data),
     [Main.IMPORT_FILES]: (data) => importFiles(data),
     [Main.BIBLE]: (data) => loadScripture(data),

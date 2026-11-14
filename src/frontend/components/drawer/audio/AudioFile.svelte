@@ -2,7 +2,7 @@
     import { AudioPlayer } from "../../../audio/audioPlayer"
     import { AudioPlaylist } from "../../../audio/audioPlaylist"
     import { addProjectItem } from "../../../converters/project"
-    import { activePlaylist, activeShow, media, outLocked, playingAudio } from "../../../stores"
+    import { activePlaylist, activeShow, shows, media, outLocked, playingAudio } from "../../../stores"
     import Icon from "../../helpers/Icon.svelte"
     import { joinTime, secondsToTime } from "../../helpers/time"
     import Button from "../../inputs/Button.svelte"
@@ -16,6 +16,7 @@
     export let index = -1
     export let fileOver = false
 
+    $: pairedSongs = Object.values($shows).filter((show) => show.quickAccess?.churchAudio?.path === path).map((show) => show.name)
     $: audioKey = playlist && index > -1 ? AudioPlayer.getKey(path, index) : path
     $: outline = !!$playingAudio[audioKey] && (!$activePlaylist || $activePlaylist?.index === index)
 </script>
@@ -46,7 +47,7 @@
             {:then duration}
                 <Icon id={$playingAudio[audioKey]?.paused === true ? "play" : $playingAudio[audioKey]?.paused === false ? "pause" : $media[path]?.favourite === true && active !== "favourites" ? "star" : AudioPlayer.getAudioType(path, duration)} white={$playingAudio[audioKey]?.paused === true || (!$playingAudio[audioKey] && ($media[path]?.favourite !== true || active === "favourites"))} right />
             {/await}
-            <p>{name.slice(0, name.lastIndexOf("."))}</p>
+            <p>{name.slice(0, name.lastIndexOf("."))}{#if pairedSongs.length}<small style="display:block;color:var(--secondary);">↔ {pairedSongs.join(", ")}</small>{/if}</p>
         </span>
         <span style="opacity: 0.8;">
             {#await AudioPlayer.getDuration(path)}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Bibel Frågesport">
+<defs>
+ <radialGradient id="bg"><stop stop-color="#174d9a"/><stop offset="1" stop-color="#061a43"/></radialGradient>
+ <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff3c4"/><stop offset=".45" stop-color="#f7c454"/><stop offset="1" stop-color="#d88d25"/></linearGradient>
+</defs>
+<rect width="512" height="512" rx="108" fill="url(#bg)"/>
+<circle cx="256" cy="240" r="185" fill="#1e5eae" opacity=".26"/>
+<path d="M163 155C161 106 201 74 254 74C309 74 346 108 346 151C346 194 302 218 284 236C272 248 269 261 269 277" fill="none" stroke="#523309" stroke-width="70" stroke-linecap="round"/>
+<path d="M163 155C161 106 201 74 254 74C309 74 346 108 346 151C346 194 302 218 284 236C272 248 269 261 269 277" fill="none" stroke="url(#gold)" stroke-width="54" stroke-linecap="round"/>
+<circle cx="269" cy="318" r="31" fill="url(#gold)" stroke="#523309" stroke-width="10"/>
+<path d="M50 355Q157 308 256 375Q357 308 463 355L451 447Q348 417 256 465Q161 417 62 447Z" fill="#7b4b12" stroke="#ffd572" stroke-width="13"/>
+<path d="M64 352Q156 312 256 376V448Q159 407 69 427Z" fill="#fff5d3"/>
+<path d="M450 352Q358 312 256 376V448Q353 407 444 427Z" fill="#f7d999"/>
+<path d="M256 377V448" stroke="#af7528" stroke-width="7"/>
+<path d="M104 371Q166 352 229 388M104 393Q166 374 229 409M282 388Q345 352 408 371M282 409Q345 374 408 393" stroke="#bb8e51" stroke-width="5" fill="none"/>
+</svg>

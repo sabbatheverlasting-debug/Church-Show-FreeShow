@@ -6,6 +6,7 @@ import { OutputHelper } from "../OutputHelper"
 export class OutputBounds {
     // BOUNDS
 
+    private static boundsRevision = new Map<string, number>()
     static moveEnabled = false
     static updatingBounds = false
     private static boundsTimeout: NodeJS.Timeout | null = null
@@ -20,9 +21,21 @@ export class OutputBounds {
         }, 1000)
     }
 
-    static updateBounds(data: { id: string; bounds: Rectangle }) {
+    static updateBounds(data: { id: string; bounds: Rectangle; screen?: string | null }) {
         const output = OutputHelper.getOutput(data.id)
         if (!output || !output.window || output.window.isDestroyed()) return
+
+        if (data.screen !== undefined) output.screen = data.screen
+        const revision = (this.boundsRevision.get(data.id) || 0) + 1
+        this.boundsRevision.set(data.id, revision)
+        const current = () => OutputHelper.getOutput(data.id) === output && this.boundsRevision.get(data.id) === revision && output.window && !output.window.isDestroyed()
+
+        // Release the previous size lock before moving to a different display or
+        // restoring a full-size visible window from a DPI-scaled hidden window.
+        if (output.boundsLocked || output.invisible) {
+            output.window.setMinimumSize(0, 0)
+            output.window.setMaximumSize(99999, 99999)
+        }
 
         // keep the configured (logical) resolution as the intent
         output.intendedBounds = data.bounds
@@ -35,13 +48,13 @@ export class OutputBounds {
 
         // has to be set twice to work first time
         setTimeout(() => {
-            if (!output.window || output.window.isDestroyed()) return
+            if (!current()) return
             output.window.setBounds(bounds)
         }, 10)
 
         // ensure bounds are set properly
         setTimeout(() => {
-            if (!output.window || output.window.isDestroyed()) return
+            if (!current()) return
             output.window.setBounds(bounds)
             OutputHelper.Lifecycle.updateWindowConstraints(data.id)
         }, 80)
@@ -92,11 +105,12 @@ export class OutputBounds {
             const centerTop = wBounds.y + wBounds.height / 2
 
             const point = { x: centerLeft, y: centerTop }
-            const targetDisplay = screen.getDisplayNearestPoint(point)
+            const targetDisplay = displays.find((display) => display.id.toString() === output.screen) || (output.screen ? undefined : screen.getDisplayNearestPoint(point))
+            if (!targetDisplay) return // retain the selected display while it is disconnected
             output.screen = targetDisplay.id.toString()
 
             if (JSON.stringify(wBounds) !== JSON.stringify(targetDisplay.bounds)) {
-                output.window.setBounds(targetDisplay.bounds)
+                this.updateBounds({ id: outputId, bounds: targetDisplay.bounds })
             }
             toApp(OUTPUT, { channel: "MOVE", data: { id: outputId, bounds: targetDisplay.bounds, screen: targetDisplay.id.toString() } })
         })

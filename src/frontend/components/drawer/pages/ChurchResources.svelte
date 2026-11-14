@@ -1,13 +1,26 @@
 <script lang="ts">
     import { Main } from "../../../../types/IPC/Main"
-    import { sendMain } from "../../../IPC/main"
+    import { requestMain, sendMain } from "../../../IPC/main"
     import { activePopup, shows, showsCache, selected, textCache } from "../../../stores"
-    import { installDefaultCues } from "../../../converters/churchPackage"
+    import { installChurchResource, installDefaultCues } from "../../../converters/churchPackage"
     import SelectElem from "../../system/SelectElem.svelte"
     import ShowButton from "../../inputs/ShowButton.svelte"
     import MaterialButton from "../../inputs/MaterialButton.svelte"
     import { loadShows } from "../../helpers/setShow"
     import { getSlideText } from "../../edit/scripts/textStyle"
+    let quizMessage = ""
+    async function quiz(action: "start" | "questions") {
+        try {
+            const result = await requestMain(Main.CHURCH_QUIZ, { action })
+            if (result?.questions) {
+                let added = 0
+                result.questions.forEach((q: any[], index: number) => {
+                    if (installChurchResource({ id: String(index + 1), title: q[0], kind: "question", source: q[3], sections: [{ text: q[0] + "\n\n" + q[1].map((answer: string, i: number) => String.fromCharCode(65 + i) + ". " + answer).join("\n"), answer: q[2] + ". " + q[1][String(q[2]).charCodeAt(0) - 65], source: q[3] }] }, "trivia-starter")) added++
+                })
+                quizMessage = `${added} frågor installerade. Dra dem till programmet; svaret visas på nästa bild.`
+            } else quizMessage = "Ledarvyn är öppnad. Projektorvyn öppnas därifrån."
+        } catch { quizMessage = "Frågesporten kunde inte öppnas. Kontrollera att port 5515 är ledig." }
+    }
     let readingId = ""
     let chapterIndex = 0
     let bookSearch = ""
@@ -41,9 +54,11 @@
 </script>
 
 <div class="tools">
+    {#if id === "questions"}<MaterialButton on:click={() => quiz("start")}>Starta frågesport · ledarvy</MaterialButton><MaterialButton on:click={() => quiz("questions")}>Lägg in frågebanken som bilder</MaterialButton>{/if}
     <MaterialButton on:click={importPackage}>Gemensam import</MaterialButton>
     {#if id === "cues"}<MaterialButton on:click={installDefaultCues}>Lägg till standardhållpunkter</MaterialButton>{/if}
 </div>
+{#if quizMessage}<p class="hint" role="status">{quizMessage}</p>{/if}
 <p class="hint">Dra en resurs till projektet. Öppna den för att läsa, redigera eller dra enskilda bilder vidare.</p>
 {#each resources as show (show.id)}
     <SelectElem id="show_drawer" data={{ id: show.id }} shiftRange={resources} draggable>

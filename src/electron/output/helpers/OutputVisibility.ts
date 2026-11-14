@@ -39,6 +39,9 @@ export class OutputVisibility {
             return "invisible"
         }
 
+        const runtimeOutput = OutputHelper.getOutput(output.id)
+        if (runtimeOutput) runtimeOutput.screen = output.screen
+
         const displays = screen.getAllDisplays()
         const isSingleScreenAutoStartup = autoStartup && displays.length <= 1
         if (isSingleScreenAutoStartup) return false
@@ -72,6 +75,11 @@ export class OutputVisibility {
         // never auto position locked bounds
         if (output.boundsLocked) return outputBounds
 
+        // A selected physical display is authoritative, even when stale coordinates
+        // still happen to overlap another connected display.
+        const selectedDisplay = displays.find((display) => display.id.toString() === output.screen)
+        if (selectedDisplay) return { ...selectedDisplay.bounds }
+
         // 1. Primary: Preserve valid coordinates if already within an active physical display
         if (displays.length > 0 && hasValidBounds && output.bounds) {
             const isCenterOnDisplay = displays.some((d) => {
@@ -81,13 +89,6 @@ export class OutputVisibility {
             })
 
             if (isCenterOnDisplay) return output.bounds
-        }
-
-        // 2. Secondary fallback: Look up by target display ID if coordinates are off-screen (e.g. topology changed)
-        if (displays.length > 0 && output.screen) {
-            const isCoveringMain = this.amountCovered(outputBounds, mainWindow!.getBounds()) > 0.5
-            const targetDisplay = isCoveringMain ? null : displays.find((d) => d.id.toString() === output.screen)
-            if (targetDisplay) return { ...targetDisplay.bounds }
         }
 
         // fallback to second display auto positioning if not locked and autoPosition requested or bounds are undefined

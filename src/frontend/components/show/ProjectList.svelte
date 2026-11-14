@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { projectMonthGroups } from "../../../types/ChurchProjectMonths"
     import { onMount } from "svelte"
     import type { Tree } from "../../../types/Projects"
     import { activeProfile, activeProject, contentProviderData, folders, labelsDisabled, openedFolders, projects } from "../../stores"
@@ -16,9 +17,12 @@
     export let tree: Tree[]
     export let readOnly = false
 
+    let groupByMonth = true
+    $: displaySections = groupByMonth ? projectMonthGroups(tree.filter((item) => item.type !== "folder")).map((group) => [{ id: "MONTH:" + group.key, name: group.label } as Tree, ...group.projects]) : splittedTree
     let visibleArchives: string[] = []
 
     function checkIfShown(project: any, _updater: any = null) {
+        if (groupByMonth) return true
         let allOpened = true
         project.path!.split("/").forEach((id: string) => {
             if (id.length && !$openedFolders.includes(id)) allOpened = false
@@ -142,13 +146,16 @@
     }
 </script>
 
+<label style="display:block;padding:6px 12px;font-size:12px;"><input type="checkbox" bind:checked={groupByMonth} /> Gruppera efter skapandemånad</label>
 {#if tree.length}
     {#if startLoading}
         <div class="fullTree">
-            {#each splittedTree as tree}
+            {#each displaySections as tree}
                 <div class="rootFolder">
                     {#each tree as project}
-                        {#if project.id === "ROOT"}
+                        {#if project.id.startsWith("MONTH:")}
+                            <div class="title" style="text-transform:capitalize;">{project.name}</div>
+                        {:else if project.id === "ROOT"}
                             <div class="title"><T id="category.unlabeled" /></div>
                         {:else}
                             {@const opened = $openedFolders.includes(project.id)}

@@ -1,0 +1,20 @@
+{
+  "name": "Bibel Frågesport",
+  "short_name": "Bibelquiz",
+  "description": "20 bibelfrågor med poäng, familjespel och TV-vy",
+  "lang": "sv-SE",
+  "start_url": "/host",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#06183a",
+  "theme_color": "#071a43",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

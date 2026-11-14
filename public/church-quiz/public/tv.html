@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071b3a">
+  <title>Bibel Frågesport TV</title>
+  <link rel="stylesheet" href="/tv-style.css?v=11800">
+</head>
+<body>
+  <video id="ambientVideo" class="ambient-video" autoplay muted loop playsinline preload="auto" aria-hidden="true"><source src="/tv-ambient.mp4" type="video/mp4"></video>
+  <main id="setup" class="setup">
+    <div class="setup-panel">
+      <div class="logo">
+        <span style="font-size:90px" aria-hidden="true">📖</span>
+        <div><div class="eyebrow">NILSSON MEDIA JÄMTLAND</div>
+          <h1>Bibel Frågesport <span>TV</span></h1>
+          <p>Spela tillsammans framför TV:n – styr från mobilen.</p>
+        </div>
+      </div>
+      <div class="connect-form">
+        <label for="address">Mobilens TV-adress eller IP-adress</label>
+        <input id="address" type="text" spellcheck="false" autocapitalize="off"
+          placeholder="192.168.1.45:3001" aria-label="Mobilens lokala IP-adress">
+        <p class="hint">Använd hela adressen från mobilen, inklusive portnumret (exempel :3001).</p>
+        <label for="code">Sexsiffrig spelkod</label>
+        <input id="code" type="text" inputmode="numeric" maxlength="6"
+          placeholder="123456" aria-label="Spelkod">
+        <button type="button" id="connect" class="primary">Anslut till spelet <span>➜</span></button>
+        <button type="button" id="forceConnect" class="secondary">Öppna TV-vyn utan anslutningstest</button>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </div>
+      <div class="instructions">
+        <div><span class="step">1</span> Öppna Bibel Frågesport på huvudmobilen.</div>
+        <div><span class="step">2</span> Öppna TV-adressen på huvudmobilen, inklusive spelkoden.</div>
+        <div><span class="step">3</span> Ange dem en gång här. TV-appen kommer ihåg dem.</div>
+      </div>
+      <p class="footer">Bibel Frågesport TV · TV-webbläsare 1.1.8 · Båda enheterna måste vara på samma nätverk.</p>
+    </div>
+  </main>
+
+  <main id="receiver" class="receiver" hidden>
+    <header class="toolbar">
+      <div class="brand">📖 <strong>Bibel Frågesport TV</strong></div>
+      <div id="receiverStatus" class="online">● Ansluten</div>
+      <div class="toolbar-buttons">
+        <button id="retry" type="button">↻ Återanslut</button>
+        <button id="direct" type="button">🇸🇪 / 🇬🇧 Språk</button>
+        <button id="settings" type="button">⚙ Ändra anslutning</button>
+      </div>
+    </header>
+    <section class="frame-wrap">
+      <div id="tvStage" class="tv-stage"><div class="tv-loading">Ansluter till huvudmobilen…</div></div>
+      <div id="offline" class="offline" hidden>
+        <h2>Kan inte nå huvudmobilen</h2>
+        <p id="offlineDetail">Kontrollera att appen på mobilen är öppen och att TV:n är ansluten till samma nätverk.</p>
+        <button id="offlineRetry" class="primary" type="button">Försök ansluta igen</button>
+        <button id="offlineSettings" type="button">Ändra IP-adress / spelkod</button>
+      </div>
+    </section>
+  </main>
+  <script src="/tv-view.js?v=11800"></script>
+  <script src="/tv-controller.js?v=11800"></script>
+</body>
+</html>
+

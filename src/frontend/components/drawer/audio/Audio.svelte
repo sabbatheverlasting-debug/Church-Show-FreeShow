@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ChurchAudioTools from "./ChurchAudioTools.svelte"
     import { uid } from "uid"
     import { Main } from "../../../../types/IPC/Main"
     import type { ClickEvent, FileFolder } from "../../../../types/Main"
@@ -311,6 +312,7 @@
         if (active === "inputs") inputsTab = id
     }
 </script>
+<ChurchAudioTools files={allRelevantFiles} />
 
 <svelte:window on:keydown={keydown} />
 
