@@ -5,5 +5,8 @@ artifactName: Church-Show-Pro-2-${version}-Intel.${ext}
 afterSign: null
 publish: null
 mac:
+    files:
+        - "!**/node_modules/openmediatransport/lib/{linux-*,win-*}/**"
+        - "!**/aero-peek-helper.exe"
     identity: null
     minimumSystemVersion: "12.0"
