@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { Main } from "../../../../types/IPC/Main"
+    import { calendarIcs } from "../../../../types/ChurchCalendar"
+    import { requestMain } from "../../../IPC/main"
     import { cueHeadingColor } from "../../../../types/churchQueueColor"
     import { churchContentName } from "../../../../types/ChurchContentName"
     import { uid } from "uid"
@@ -169,6 +172,24 @@
             message = "Texten har lagts till. Skriv en rubrik för punkten."
         }
     }
+    let shareOpen = false
+    let shareDate = new Date().toLocaleDateString("sv-SE"), shareTime = "10:30"
+    async function shareProgram(calendar = false) {
+        const title = draft.title.trim() || "Gudstjänstprogram"
+        const agenda = draft.rows.map(row => {
+            const name = row.title.trim() || $shows[row.resourceId]?.name || row.file?.name || "Programpunkt"
+            return (row.kind === "cue" ? "◆ " : "") + name + (row.person.trim() ? " – " + row.person.trim() : "")
+        }).join("\n")
+        try {
+            let ics: string | undefined
+            if (calendar) {
+                const start = new Date(shareDate + "T" + shareTime)
+                if (!Number.isFinite(start.getTime())) { message = "Välj datum och starttid."; return }
+                ics = calendarIcs({ [(draft.rows[0]?.id || uid()) + "-" + shareDate]: { type: "event", name: title, notes: agenda, from: start.toISOString(), to: start.toISOString(), time: true, repeat: false, color: null } }, { calendar: "__unassigned__", enabled: true, name: title, includeNotes: true, token: "" })
+            }
+            message = await requestMain(Main.SHARE_PROGRAM, { title, text: title + "\n\n" + agenda, ics }) || ""
+        } catch { message = "Det gick inte att dela programmet." }
+    }
     function printPlan() {
         const frame = document.createElement("iframe")
         frame.setAttribute("title", "Utskrift av program")
@@ -259,9 +280,11 @@
             <h2>Planering</h2>
             <p>Dra en sång eller fil till en punkt. Välj medverkande i punktens lista eller dra dit ett namn.</p>
         </div>
+        <button disabled={!draft.rows.length} aria-expanded={shareOpen} on:click={() => shareOpen = !shareOpen}>Dela</button>
         <button disabled={!draft.rows.length} on:click={printPlan}>Skriv ut / PDF</button>
         <button class="create" disabled={busy || created || !draft.rows.length || !draft.title.trim()} on:click={create}>Skapa program och öppna Show</button>
     </header>
+    {#if shareOpen}<div class="actions"><button on:click={() => shareProgram()}>Dela programtext</button><label>Datum<input type="date" bind:value={shareDate} /></label><label>Starttid<input type="time" bind:value={shareTime} /></label><button on:click={() => shareProgram(true)}>Dela kalenderfil</button></div>{/if}
     <label class="title">Programmets rubrik<input bind:value={draft.title} on:input={() => (created = false)} placeholder="Till exempel Sabbatsgudstjänst – Hopp" /></label>
     <div class="actions"><button on:click={() => add("song")}>+ Sång</button><button on:click={() => add("study")}>+ Studium / text / fil</button><button on:click={() => add("cue")}>+ Hållpunkt</button><label class="upload">Lägg in filer<input type="file" {accept} multiple disabled={busy} on:change={(event) => fileInput(event)} /></label></div>
     <datalist id="church-program-people">{#each people as person}<option value={person}></option>{/each}</datalist>

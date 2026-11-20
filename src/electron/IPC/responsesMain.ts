@@ -1,7 +1,8 @@
 import { churchSongStyles } from "../../types/ChurchSongStyles"
 import * as Sentry from "@sentry/electron/main"
 import type { BrowserWindow, DesktopCapturerSource } from "electron"
-import { app, desktopCapturer, screen, shell, systemPreferences } from "electron"
+import { writeFile as saveCalendarFile } from "fs/promises"
+import { ShareMenu, dialog, clipboard, app, desktopCapturer, screen, shell, systemPreferences } from "electron"
 import os from "os"
 import path from "path"
 import { getMainWindow, isProd, mainWindow, maximizeMain, setGlobalMenu } from ".."
@@ -86,6 +87,18 @@ export const mainResponses: MainResponses = {
     [Main.BACKUPS]: () => getBackups(),
     [Main.DELETE_BACKUP]: (data) => deleteBackup(data),
     [Main.CHURCH_AUDIO_FILES]: async (data) => (await import("../data/churchAudioFiles")).churchAudioFiles(data),
+    [Main.SHARE_PROGRAM]: async (data) => {
+        if (data.ics) {
+            const result = await dialog.showSaveDialog({ defaultPath: (path.basename(data.title).replace(/[^\p{L}\p{N} _-]/gu, "") || "Program") + ".ics", filters: [{ name: "Kalender", extensions: ["ics"] }] })
+            if (!result.filePath || result.canceled) return ""
+            await saveCalendarFile(result.filePath, data.ics, "utf8")
+            if (process.platform === "darwin") new ShareMenu({ filePaths: [result.filePath] }).popup()
+            return "Kalenderfilen är sparad."
+        }
+        if (process.platform === "darwin") { new ShareMenu({ texts: [data.text] }).popup(); return "" }
+        clipboard.writeText(data.text)
+        return "Programmet är kopierat."
+    },
     [Main.CHURCH_QUIZ]: async (data) => (await import("../data/churchQuiz")).churchQuiz(data),
     [Main.CHURCH_CALENDAR]: async (data) => (await import("../data/churchCalendar")).churchCalendar(data),
     [Main.CHURCH_SONG_STYLES]: async () => JSON.parse(String((await import("../data/churchStylePack")).prepareChurchStyleFile({ extension: "json", content: JSON.stringify(churchSongStyles) }).content)),

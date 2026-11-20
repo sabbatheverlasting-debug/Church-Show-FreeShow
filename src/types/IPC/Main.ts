@@ -29,6 +29,7 @@ export enum Main {
     IS_DEV = "IS_DEV",
     GET_CACHE_PATH = "GET_CACHE_PATH",
     CHURCH_AUDIO_FILES = "CHURCH_AUDIO_FILES",
+    SHARE_PROGRAM = "SHARE_PROGRAM",
     CHURCH_QUIZ = "CHURCH_QUIZ",
     CHURCH_CALENDAR = "CHURCH_CALENDAR",
     CHURCH_SONG_STYLES = "CHURCH_SONG_STYLES",
@@ -200,6 +201,7 @@ export enum Main {
 }
 
 export interface MainSendPayloads {
+    [Main.SHARE_PROGRAM]: { title: string; text: string; ics?: string }
     [Main.CHURCH_QUIZ]: { action: "start" | "questions" }
     [Main.CHURCH_AUDIO_FILES]: { paths?: string[]; remove?: string; keep?: string }
     [Main.CHURCH_CALENDAR]: { action?: "status" | "enable" | "disable"; calendar?: string; name?: string; includeNotes?: boolean }
@@ -351,6 +353,7 @@ export interface MainReturnPayloads {
     [Main.SHOW]: { id: string; error?: string; content?: [string, Show] }
     ///
     [Main.CHURCH_AUDIO_FILES]: any
+    [Main.SHARE_PROGRAM]: string
     [Main.CHURCH_QUIZ]: any
     [Main.CHURCH_CALENDAR]: any
     [Main.CHURCH_SONG_STYLES]: any
