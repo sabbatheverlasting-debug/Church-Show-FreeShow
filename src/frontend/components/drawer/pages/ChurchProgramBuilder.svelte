@@ -190,6 +190,27 @@
             message = await requestMain(Main.SHARE_PROGRAM, { title, text: title + "\n\n" + agenda, ics }) || ""
         } catch { message = "Det gick inte att dela programmet." }
     }
+    function exportAndroidAgenda() {
+        const title = draft.title.trim() || "Gudstjänstprogram"
+        const slides = draft.rows.map(row => {
+            const name = row.title.trim() || $shows[row.resourceId]?.name || row.file?.name || "Programpunkt"
+            const label = row.kind === "cue" ? "Hållpunkt" : row.kind === "song" ? "Sång" : "Programpunkt"
+            return { label, text: [row.kind === "cue" ? "◆ " + name : name, row.person.trim()].filter(Boolean).join("\n") }
+        })
+        if (title.length >= 500 || slides.length > 200 || slides.some(slide => slide.text.length > 4000)) {
+            message = "Programmet är för långt för Androidimporten (max 200 punkter, 499 tecken i titeln och 4000 per punkt)."
+            return
+        }
+        const file = new Blob([JSON.stringify({ type: "slide", title, slides })], { type: "application/json" })
+        const url = URL.createObjectURL(file)
+        const link = document.createElement("a")
+        link.href = url
+        link.download = title.replace(/[\\/:*?"<>|]/g, "-") + "-Android.json"
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        setTimeout(() => URL.revokeObjectURL(url), 60000)
+    }
     function printPlan() {
         const frame = document.createElement("iframe")
         frame.setAttribute("title", "Utskrift av program")
@@ -284,7 +305,7 @@
         <button disabled={!draft.rows.length} on:click={printPlan}>Skriv ut / PDF</button>
         <button class="create" disabled={busy || created || !draft.rows.length || !draft.title.trim()} on:click={create}>Skapa program och öppna Show</button>
     </header>
-    {#if shareOpen}<div class="actions"><button on:click={() => shareProgram()}>Dela programtext</button><label>Datum<input type="date" bind:value={shareDate} /></label><label>Starttid<input type="time" bind:value={shareTime} /></label><button on:click={() => shareProgram(true)}>Dela kalenderfil</button></div>{/if}
+    {#if shareOpen}<div class="actions"><button on:click={exportAndroidAgenda}>Exportera till Church Show Android</button><button on:click={() => shareProgram()}>Dela programtext</button><label>Datum<input type="date" bind:value={shareDate} /></label><label>Starttid<input type="time" bind:value={shareTime} /></label><button on:click={() => shareProgram(true)}>Dela kalenderfil</button></div>{/if}
     <label class="title">Programmets rubrik<input bind:value={draft.title} on:input={() => (created = false)} placeholder="Till exempel Sabbatsgudstjänst – Hopp" /></label>
     <div class="actions"><button on:click={() => add("song")}>+ Sång</button><button on:click={() => add("study")}>+ Studium / text / fil</button><button on:click={() => add("cue")}>+ Hållpunkt</button><label class="upload">Lägg in filer<input type="file" {accept} multiple disabled={busy} on:change={(event) => fileInput(event)} /></label></div>
     <datalist id="church-program-people">{#each people as person}<option value={person}></option>{/each}</datalist>
