@@ -22,3 +22,8 @@ export function churchQueueColor(category: string, title: string, type: string, 
     if (type === "scripture") return drawerColors.scripture
     return ""
 }
+
+export function cueHeadingColor(title: string): string {
+    const colors: Record<string, string> = { "välkommen": "#344966", "bön": "#51416b", "kollekt": "#67502e", "barnens stund": cueCardColor, "predikan": "#573953", "avslutning": "#305651" }
+    return colors[title.trim().toLocaleLowerCase("sv").split(" · ")[0]] || cueCardColor
+}

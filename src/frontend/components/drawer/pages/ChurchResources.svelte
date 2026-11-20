@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { cueHeadingColor } from "../../../../types/churchQueueColor"
+    import { onMount } from "svelte"
     import { Main } from "../../../../types/IPC/Main"
     import { requestMain, sendMain } from "../../../IPC/main"
     import { activePopup, shows, showsCache, selected, textCache } from "../../../stores"
@@ -8,6 +10,17 @@
     import MaterialButton from "../../inputs/MaterialButton.svelte"
     import { loadShows } from "../../helpers/setShow"
     import { getSlideText } from "../../edit/scripts/textStyle"
+    let creatingCue = false
+    let cueName = ""
+    onMount(() => { if (id === "cues") installDefaultCues() })
+    function createCue() {
+        const title = cueName.trim()
+        if (!title) return
+        if (!Object.values($shows).some(show => show.category === "church_cues" && show.name.toLocaleLowerCase() === title.toLocaleLowerCase()))
+            installChurchResource({ id: title.toLocaleLowerCase(), kind: "cue", title, sections: [{ text: title }] }, "personal-cues")
+        creatingCue = false
+        cueName = ""
+    }
     let quizMessage = ""
     async function quiz(action: "start" | "questions") {
         try {
@@ -56,17 +69,21 @@
 <div class="tools">
     {#if id === "questions"}<MaterialButton on:click={() => quiz("start")}>Starta frågesport · ledarvy</MaterialButton><MaterialButton on:click={() => quiz("questions")}>Lägg in frågebanken som bilder</MaterialButton>{/if}
     <MaterialButton on:click={importPackage}>Gemensam import</MaterialButton>
-    {#if id === "cues"}<MaterialButton on:click={installDefaultCues}>Lägg till standardhållpunkter</MaterialButton>{/if}
+    
 </div>
 {#if quizMessage}<p class="hint" role="status">{quizMessage}</p>{/if}
 {#if id === "cues"}<p class="hint">Dra en hållpunkt till rätt plats i planeringen.</p>{:else}<p class="hint">Dra en resurs till projektet. Öppna den för att läsa, redigera eller dra enskilda bilder vidare.</p>{/if}
 {#each resources as show (show.id)}
     <SelectElem id="show_drawer" data={{ id: show.id }} shiftRange={resources} draggable>
-        <ShowButton id={show.id} {show} />
+        {#if id === "cues"}<div class="cue-heading" style:background-color={cueHeadingColor(show.name)}>◆　{show.name}</div>{:else}<ShowButton id={show.id} {show} />{/if}
     </SelectElem>
     {#if id !== "cues"}<button on:click={() => read(show.id)}>Läs och markera text</button>{/if}
 {/each}
-{#if !resources.length}<p class="hint">Inga resurser här ännu. Installera ett paket via Gemensam import.</p>{/if}
+{#if id === "cues"}
+    {#if creatingCue}<form on:submit|preventDefault={createCue}><input aria-label="Ny hållpunkt" placeholder="Rubrik" bind:value={cueName} /><button disabled={!cueName.trim()}>Spara</button><button type="button" on:click={() => creatingCue = false}>Avbryt</button></form>
+    {:else}<button on:click={() => creatingCue = true}>＋ Skapa ny</button>{/if}
+{/if}
+{#if !resources.length && id !== "cues"}<p class="hint">Inga resurser här ännu. Installera ett paket via Gemensam import.</p>{/if}
 {#if reading && id !== "cues"}
     <article on:dragstart={dragQuote} style="padding:20px;max-width:900px;user-select:text;">
         <h2>{reading.name}</h2>
@@ -89,6 +106,7 @@
 {/if}
 
 <style>
+    .cue-heading { padding: 5px 10px; color: white; font-weight: 700; cursor: grab; }
     .chosen {
         border-left: 3px solid #d6ba79;
     }

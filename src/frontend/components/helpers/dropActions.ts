@@ -252,7 +252,7 @@ export const dropActions = {
                     const show = get(showsCache)[item.id]
                     if (show?.category !== "church_cues") return item
                     const notes = Object.values(show.slides).map((slide) => slide.notes || getSlideText(slide)).join("\n")
-                    return { id: uid(), type: "section", name: show.name, notes, color: "#C6A45D" }
+                    return { id: uid(), type: "section", name: show.name, notes, }
                 })
             }
         }

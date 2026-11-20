@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy, onMount } from "svelte"
     import { fade } from "svelte/transition"
-    import { churchQueueColor } from "../../../types/churchQueueColor"
+    import { cueHeadingColor } from "../../../types/churchQueueColor"
     import type { ProjectShowRef, Tree } from "../../../types/Projects"
     import type { ShowType } from "../../../types/Show"
     import { addProjectItem, addToProject, updateRecentlyAddedFiles } from "../../converters/project"
@@ -291,7 +291,7 @@
                             {:else}
                                 <SelectElem id="show" dropAbove={isFirst} triggerOnHover data={{ ...show, name: show.name || removeExtension(getFileName(show.id)), index }} {fileOver} borders={show.type === "show_placeholder" ? "all" : "edges"} trigger="column" draggable={!isLocked} selectable={!isLocked}>
                                     {#if show.type === "section"}
-                                        {@const sectionColor = show.color || churchQueueColor("", show.name || "", "section")}
+                                        {@const sectionColor = show.color || cueHeadingColor(show.name || "")}
                                         <MaterialButton
                                             {isActive}
                                             class="section {projectReadOnly || isLocked ? '' : `context #project_section ${show.color ? 'color-border' : ''}`}"
