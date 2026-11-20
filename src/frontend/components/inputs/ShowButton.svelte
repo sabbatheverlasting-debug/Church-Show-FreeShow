@@ -354,7 +354,8 @@
         {/if}
     </MaterialButton>
     {#if type === "show" && $shows[id]?.quickAccess?.churchAudio}
-        <span class="context {$$props.class || ''}{readOnly ? '_readonly' : ''}" style="font-size:0.8em;padding:2px 8px;" title="Ljudet startar på första bilden och fortsätter mellan verserna">♫ {$shows[id].quickAccess.churchAudio.name}</span>
+        <span class="context {$$props.class || ''}{readOnly ? '_readonly' : ''}" style="font-size:0.8em;padding:2px 8px;" title="Kopplad ljudfil">♫ {$shows[id].quickAccess.churchAudio.name}</span>
+        {#if isProject}<button type="button" on:click|stopPropagation={() => { const track = $shows[id]?.quickAccess?.churchAudio; if (track?.path) AudioPlayer.start(track.path, { name: track.name }, { pauseIfPlaying: false }) }}>▶ Spela musik</button>{/if}
     {/if}
 
     {#if match !== null}

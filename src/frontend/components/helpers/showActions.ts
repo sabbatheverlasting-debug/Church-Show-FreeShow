@@ -439,6 +439,7 @@ export function updateOut(showId: string, index: number, layout: LayoutRef[], ex
             // let clear action trigger first
             setTimeout(() => {
                 data.audio?.forEach((audio: string) => {
+                    if (audio === _show(showId).get("quickAccess")?.churchAudio?.id) return
                     const a = clone(_show(showId).get("media")?.[audio] || {})
                     if (!a) return
 

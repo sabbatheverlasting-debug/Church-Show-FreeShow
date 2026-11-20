@@ -40,10 +40,6 @@ export async function pairChurchAudio(showId: string, path: string | null) {
         const name = path.split(/[\\/]/).pop() || "Ljud"
         show.media[id] = { name, path, type: "audio" }
         show.quickAccess.churchAudio = { id, name, path }
-        for (const layout of Object.values(show.layouts) as any[]) {
-            const first = layout.slides[0]
-            if (first) first.audio = [...(first.audio || []), id]
-        }
     }
     history({ id: "UPDATE", newData: { data: show }, oldData: { id: showId }, location: { page: "show", id: "show" } })
 }
