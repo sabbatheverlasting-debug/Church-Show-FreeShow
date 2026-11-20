@@ -59,15 +59,15 @@
     {#if id === "cues"}<MaterialButton on:click={installDefaultCues}>Lägg till standardhållpunkter</MaterialButton>{/if}
 </div>
 {#if quizMessage}<p class="hint" role="status">{quizMessage}</p>{/if}
-<p class="hint">Dra en resurs till projektet. Öppna den för att läsa, redigera eller dra enskilda bilder vidare.</p>
+{#if id === "cues"}<p class="hint">Dra en hållpunkt till rätt plats i planeringen.</p>{:else}<p class="hint">Dra en resurs till projektet. Öppna den för att läsa, redigera eller dra enskilda bilder vidare.</p>{/if}
 {#each resources as show (show.id)}
     <SelectElem id="show_drawer" data={{ id: show.id }} shiftRange={resources} draggable>
         <ShowButton id={show.id} {show} />
     </SelectElem>
-    <button on:click={() => read(show.id)}>Läs och markera text</button>
+    {#if id !== "cues"}<button on:click={() => read(show.id)}>Läs och markera text</button>{/if}
 {/each}
 {#if !resources.length}<p class="hint">Inga resurser här ännu. Installera ett paket via Gemensam import.</p>{/if}
-{#if reading}
+{#if reading && id !== "cues"}
     <article on:dragstart={dragQuote} style="padding:20px;max-width:900px;user-select:text;">
         <h2>{reading.name}</h2>
         <p>Markera ett utdrag och dra det till projektet eller bildspelet. Källan följer med.</p>
