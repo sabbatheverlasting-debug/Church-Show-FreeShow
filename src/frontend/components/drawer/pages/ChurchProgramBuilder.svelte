@@ -16,6 +16,31 @@
         .filter(([, show]) => show.category !== "church_books")
         .map(([id, show]) => ({ id, ...show }))
         .sort((a, b) => a.name.localeCompare(b.name, "sv"))
+    let newPerson = ""
+    $: people = mergeNames($special.churchProgramPeople || [], draft.rows.map(row => row.person))
+    function mergeNames(saved: string[], additions: string[]): string[] {
+        const names = new Map<string, string>()
+        for (const raw of [...saved, ...additions]) {
+            const name = raw.trim().replace(/\s+/g, " ")
+            const key = name.toLocaleLowerCase("sv")
+            if (name && !names.has(key)) names.set(key, name)
+        }
+        return [...names.values()].sort((a, b) => a.localeCompare(b, "sv"))
+    }
+    function saveNames(names: string[]) {
+        special.update(value => ({ ...value, churchProgramPeople: mergeNames(value.churchProgramPeople || [], names) }))
+    }
+    function rememberPerson() {
+        const name = newPerson.trim()
+        if (!name) return
+        saveNames([name])
+        newPerson = ""
+    }
+    function assign(person: string, target: string) {
+        saveNames([person])
+        draft = { ...draft, rows: draft.rows.map(row => row.id === target ? { ...row, person } : row) }
+        created = false
+    }
     function blank(kind: ProgramRow["kind"]): ProgramRow {
         return { id: uid(), kind, resourceId: "", title: "", person: "", notes: "" }
     }
@@ -84,6 +109,12 @@
         event.preventDefault()
         event.stopPropagation()
         if (busy) return
+        const person = event.dataTransfer?.getData("application/x-church-person")
+        if (person) {
+            if (target) assign(person, target)
+            else message = "Släpp namnet på en programpunkt."
+            return
+        }
         if (event.dataTransfer?.files.length) {
             await attach(Array.from(event.dataTransfer.files), target)
             return
@@ -160,6 +191,7 @@
                 resources[id] = show
                 return { ...row, resourceId: id, file: undefined }
             })
+            saveNames(rows.map(row => row.person))
             const project = buildChurchProgram({ ...draft, rows }, resources)
             if (pending.length) history({ id: "SHOWS", newData: { data: pending, projectImport: true } })
             const id = uid()
@@ -178,18 +210,28 @@
     <header>
         <div>
             <h2>Planering</h2>
-            <p>Skriv, dra från biblioteket nedanför eller lägg in en fil från datorn.</p>
+            <p>Dra en sång eller fil till en punkt. Välj medverkande i punktens lista eller dra dit ett namn.</p>
         </div>
-        <button class="create" disabled={busy || created || !draft.rows.length || !draft.title.trim()} on:click={create}>Skapa project och öppna Show</button>
+        <button class="create" disabled={busy || created || !draft.rows.length || !draft.title.trim()} on:click={create}>Skapa program och öppna Show</button>
     </header>
     <label class="title">Programmets rubrik<input bind:value={draft.title} on:input={() => (created = false)} placeholder="Till exempel Sabbatsgudstjänst – Hopp" /></label>
     <div class="actions"><button on:click={() => add("song")}>+ Sång</button><button on:click={() => add("study")}>+ Studium / text / fil</button><button on:click={() => add("cue")}>+ Hållpunkt</button><label class="upload">Lägg in filer<input type="file" {accept} multiple disabled={busy} on:change={(event) => fileInput(event)} /></label></div>
+    <datalist id="church-program-people">{#each people as person}<option value={person}></option>{/each}</datalist>
+    <div class="people">
+        <form on:submit|preventDefault={rememberPerson}><input aria-label="Namn på medverkande" placeholder="Namn på medverkande" bind:value={newPerson} /><button disabled={!newPerson.trim()}>Lägg till namn</button></form>
+        {#each people as person}<span class="person-chip" draggable="true" on:dragstart={(event) => event.dataTransfer?.setData("application/x-church-person", person)}>{person}</span>{/each}
+    </div>
     {#if message}<p role="status" class="message">{message}</p>{/if}
     <div class="points">
         {#each draft.rows as row, index (row.id)}
             <fieldset on:dragover|preventDefault on:drop={(event) => drop(event, row.id)} on:input={() => (created = false)} on:change={() => (created = false)}>
                 <legend>{index + 1}. {row.kind === "song" ? "Sång" : row.kind === "cue" ? "Hållpunkt" : "Studium / text / fil"}</legend>
-                <div class="fields"><label>Rubrik<input bind:value={row.title} placeholder={$shows[row.resourceId]?.name || row.file?.name || "Punktens rubrik"} /></label><label>Ansvarig / medverkande<input bind:value={row.person} placeholder="Vem gör detta?" /></label></div>
+                <div class="quick-row">
+                    <strong>{row.title || $shows[row.resourceId]?.name || row.file?.name || (row.kind === "cue" ? "Ny hållpunkt" : "Släpp innehåll här")}</strong>
+                    <input class="person-input" list="church-program-people" aria-label={`Medverkande för punkt ${index + 1}`} placeholder="Skriv eller välj namn…" bind:value={row.person} on:change={() => assign(row.person.trim(), row.id)} />
+                </div>
+                <details><summary>Redigera punkt</summary>
+                <div class="fields"><label>Rubrik<input bind:value={row.title} placeholder={$shows[row.resourceId]?.name || row.file?.name || "Punktens rubrik"} /></label></div>
                 {#if row.kind !== "cue"}
                     <div class="drop-field">
                         Släpp innehåll här för den här punkten
@@ -219,6 +261,7 @@
                     >
                 {/if}
                 <label>Anteckningar för ledaren<textarea bind:value={row.notes} rows="2" placeholder="Visas inte som egen text på projektorn"></textarea></label>
+                </details>
                 <details class="insert-point">
                     <summary aria-label={`Lägg till en ny programpunkt efter punkt ${index + 1}`}>＋ Lägg till efter denna punkt</summary>
                     <div class="actions"><button on:click={(event) => insert(event, index, "song")}>Sång</button><button on:click={(event) => insert(event, index, "study")}>Studium / text / fil</button><button on:click={(event) => insert(event, index, "cue")}>Hållpunkt</button></div>
@@ -254,9 +297,14 @@
     .title {
         max-width: 900px;
     }
+    .people, .people form, .quick-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .person-chip { cursor: grab; padding: 3px 8px; border: 1px solid var(--primary-lighter); border-radius: 5px; }
+    .quick-row .person-input { width: auto; max-width: 100%; }
+    .quick-row { justify-content: space-between; }
+    summary { cursor: pointer; }
     .points {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+        grid-template-columns: minmax(0, 1fr);
         gap: 16px;
     }
     label {
