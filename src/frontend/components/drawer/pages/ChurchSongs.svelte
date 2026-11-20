@@ -9,11 +9,10 @@
     import SelectElem from "../../system/SelectElem.svelte"
     import ShowButton from "../../inputs/ShowButton.svelte"
     import ChurchAudioTools from "../audio/ChurchAudioTools.svelte"
-    import { openChurchPlanning } from "../../../utils/churchPlanning"
     export let searchValue = ""
     let files: { name: string; path: string; isFolder?: boolean }[] = []
     let message = "",
-        showAll = false
+        showAll = false, showTools = false
     $: library = Object.entries($shows)
         .filter(([, show]) => !["church_books", "church_questions", "church_cues", "church_studies"].includes(show.category || ""))
         .map(([id, show]) => ({ ...show, id }))
@@ -55,22 +54,23 @@
 </script>
 
 <div class="songs">
-    <div class="tools"><button on:click={openChurchPlanning}>Öppna planering ovanför</button><label><input type="checkbox" bind:checked={showAll} /> Visa även övriga bildspel</label><button on:click={refresh}>Läs om ljudbiblioteket</button></div>
-    <p>Dra sången upp till ditt vanliga show-program eller till planeringen ovanför. Ljudkopplingen följer med. Dra en ljudfil till sången för att koppla eller byta ljud.</p>
-    <ChurchAudioTools {files} />
-    {#if message}<p role="status">{message}</p>{/if}
+    <details bind:open={showTools}>
+        <summary>Sångverktyg</summary>
+        <div class="tools"><label><input type="checkbox" bind:checked={showAll} /> Visa även övriga bildspel</label><button on:click={refresh}>Läs om ljudbiblioteket</button></div>
+        <ChurchAudioTools {files} />
+        {#if message}<p role="status">{message}</p>{/if}
+    </details>
     <div class="columns">
         <div class="library">
             {#each songs as song (song.id)}
                 <div class="song" on:dragstart={(event) => drag(event, song.id)} on:dragover|preventDefault on:drop={(event) => dropAudio(event, song.id)}>
-                    <SelectElem id="show_drawer" data={{ id: song.id }} shiftRange={songs} draggable><ShowButton id={song.id} show={song} /></SelectElem>
-                    {#if song.quickAccess?.churchAudio}
-                        <p class="paired">↔ Kopplad: {song.quickAccess.churchAudio.name}</p>
+                    <SelectElem id="show_drawer" data={{ id: song.id }} shiftRange={songs} draggable><ShowButton id={song.id} show={song} class="#drawer_show_button" /></SelectElem>
+                    {#if showTools && song.quickAccess?.churchAudio}
                         <audio controls preload="none" src={encodeFilePath(song.quickAccess.churchAudio.path)}></audio>
-                    {:else}<p>{ambiguous.includes(song.name) ? "Flera möjliga träffar – välj ljud manuellt" : "Saknar kopplat ljud"}</p>{/if}
+                    {:else if showTools}<p>{ambiguous.includes(song.name) ? "Flera möjliga träffar – välj ljud manuellt" : "Saknar kopplat ljud"}</p>{/if}
                 </div>
             {/each}
-            {#if !songs.length}<p>Inga sånger matchar. Välj ”Visa även övriga bildspel” om sångerna ännu inte ligger i en sångkategori.</p>{/if}
+            {#if !songs.length}<p>Inga sånger matchar. Öppna Sångverktyg och välj ”Visa även övriga bildspel” om sångerna ännu inte ligger i en sångkategori.</p>{/if}
         </div>
     </div>
 </div>
@@ -94,17 +94,14 @@
         min-width: 0;
     }
     .song {
-        padding: 8px;
-        margin: 8px 0;
+        padding: 2px 4px;
+        margin: 2px 0;
         border: 1px solid var(--primary-lighter);
         border-radius: 6px;
     }
     .song p {
         font-size: 13px;
         overflow-wrap: anywhere;
-    }
-    .paired {
-        color: var(--secondary);
     }
     audio {
         width: 100%;
