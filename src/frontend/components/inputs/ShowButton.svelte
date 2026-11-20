@@ -1,6 +1,6 @@
 <script lang="ts">
     import { droppedAudio, pairChurchAudio } from "../../converters/churchAudio"
-    import { churchQueueColor } from "../../../types/churchQueueColor"
+    import { churchQueueColor, cueCardColor } from "../../../types/churchQueueColor"
     import type { ClickEvent } from "../../../types/Main"
     import { AudioPlayer } from "../../audio/audioPlayer"
     import { activeEdit, activeFocus, activePage, activeProject, activeShow, categories, editingProjectTemplate, effects, focusMode, globalTags, media, notFound, outLocked, outputs, overlayCategories, overlays, playerVideos, playingAudio, projects, projectTemplates, refreshEditSlide, shows, showsCache, special, styles, textCache } from "../../stores"
@@ -277,12 +277,14 @@
     $: showTemplateName = type === "show_placeholder" ? (show.name && show.name !== "—" ? show.name : translateText("new.placeholder")) + (showPlaceholderShowName ? ` (${showPlaceholderShowName})` : "") : ""
 </script>
 
-<div on:dragover|preventDefault on:drop={pairDrop} id="show_{id}" data-paired-show={type === "show" && !readOnly && (!isProject || $$props.class) && $shows[id]?.quickAccess?.churchAudio ? id : undefined} class="main" class:queueCard={!!queueColor} style:--queue-card={queueColor} class:isProject class:played={show.played}>
+<div on:dragover|preventDefault on:drop={pairDrop} id="show_{id}" data-paired-show={type === "show" && !readOnly && (!isProject || $$props.class) && $shows[id]?.quickAccess?.churchAudio ? id : undefined} class="main" class:queueCard={!!queueColor} class:cueCard={queueColor === cueCardColor} style:--queue-card={queueColor} class:isProject class:played={show.played}>
     <MaterialButton on:click={click} on:dblclick={doubleClick} {isActive} showOutline={outline} class="context {$$props.class}{readOnly ? '_readonly' : ''}" style="font-weight: normal;--outline-color: {activeOutput || 'var(--secondary)'};{$notFound.show?.includes(id) ? 'background-color: rgb(255 0 0 / 0.2);' : ''}{$$props.style || ''}" tab>
         <div class="row" style={type === "show_placeholder" ? "font-style: italic;" : ""}>
             <span class="cell" style={isProject ? `width: 100%;max-width: ${show.layoutInfo?.name || show.scheduleLength ? 92 : 100}%;` : `width: 75%;min-width: 120px;max-width: calc(100% ${showNumber ? "- var(--number-width)" : ""} - var(--modified-width, 0px));`}>
                 <div class="icon" class:isMedia style="position: relative;">
-                    {#if type === "show_placeholder"}
+                    {#if queueColor === cueCardColor}
+                        <span aria-hidden="true">◆</span>
+                    {:else if type === "show_placeholder"}
                         <Icon id="swap" white right />
                     {:else if thumbnailPath}
                         <img class="thumbnail" src={encodeFilePath(thumbnailPath)} alt="thumbnail" style={mediaStyleString} />
@@ -391,6 +393,12 @@
     .queueCard :global(button.tab) {
         background-color: transparent !important;
         color: #17232c;
+    }
+
+    .queueCard.cueCard, .queueCard.cueCard :global(button.tab) {
+        --text: white;
+        color: white;
+        font-weight: 700 !important;
     }
 
     .row {

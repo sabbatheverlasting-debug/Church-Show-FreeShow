@@ -295,7 +295,7 @@
                                         <MaterialButton
                                             {isActive}
                                             class="section {projectReadOnly || isLocked ? '' : `context #project_section ${show.color ? 'color-border' : ''}`}"
-                                            style="{borderRadiusStyle}justify-content: left;background-color: var(--primary-darkest);border-top: 1px solid var(--primary-lighter);padding: 0.1em 1em;{!show.color || $fullColors ? `background-color: ${sectionColor} !important;color: ${getContrast(sectionColor)};` : `background-color: ${fadeColor(show.color || '', 0.2)} !important;color: ${show.color ? brightenDarkColor(show.color) : ''};`}"
+                                            style="{borderRadiusStyle}justify-content: left;background-color: var(--primary-darkest);border-top: 1px solid var(--primary-lighter);padding: 0.28em 1em;font-weight: 700;{!show.color || $fullColors ? `background-color: ${sectionColor} !important;color: ${getContrast(sectionColor)};` : `background-color: ${fadeColor(show.color || '', 0.2)} !important;color: ${show.color ? brightenDarkColor(show.color) : ''};`}"
                                             on:click={(e) => {
                                                 if (e.detail.ctrl) return
                                                 if ($focusMode) activeFocus.set({ id: show.id, index, type: show.type })
@@ -303,6 +303,7 @@
                                             }}
                                             tab
                                         >
+                                            <span aria-hidden="true" style="margin-inline-end: 0.55em;">◆</span>
                                             {#if sectionTime}
                                                 <span style="font-weight: normal;">
                                                     <span style="opacity: 0.7;">{show.data.time}</span>
