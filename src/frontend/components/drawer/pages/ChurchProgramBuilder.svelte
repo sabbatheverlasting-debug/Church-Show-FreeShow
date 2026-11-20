@@ -276,7 +276,9 @@
 
 <style>
     .builder {
-        padding: 20px 28px;
+        width: 100%;
+        max-width: 740px;
+        padding: 12px clamp(8px, 2vw, 16px);
         min-height: 100%;
         box-sizing: border-box;
     }
@@ -299,7 +301,7 @@
     }
     .people, .people form, .quick-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .person-chip { cursor: grab; padding: 3px 8px; border: 1px solid var(--primary-lighter); border-radius: 5px; }
-    .quick-row .person-input { width: auto; max-width: 100%; }
+    .quick-row .person-input { width: 11rem; max-width: 100%; }
     .quick-row { justify-content: space-between; }
     summary { cursor: pointer; }
     .points {
