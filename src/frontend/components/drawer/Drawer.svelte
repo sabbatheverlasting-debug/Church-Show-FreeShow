@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { cueCardColor, drawerColors } from "../../../types/churchQueueColor"
     import { onDestroy } from "svelte"
     import type { DrawerTabIds } from "../../../types/Tabs"
     import { activeDrawerTab, activeEdit, activePage, activePopup, activeProject, activeShow, activeTriggerFunction, dictionary, drawer, drawerOpenedInEdit, drawerTabsData, focusMode, labelsDisabled, mediaOptions, os, previousShow, projects, quickTextCache, scriptureSettings, selected, showsCache } from "../../stores"
@@ -273,9 +274,10 @@
         <span class="tabs">
             {#each tabs as tab, i}
                 {#if $drawerTabsData[tab.id]?.enabled !== false && getAccess(tab.id).global !== "none" && (!$focusMode || !hiddenInFocusMode.includes(tab.id))}
-                    <!-- overflow: unset; -->
-                    <MaterialButton id={tab.id} style="border-radius: 0;border-bottom: 2px solid var(--primary);padding: 0.2em 0.8em;" class="context #drawer_top" title="<b>{tab.name.split('.')[0]}.{tab.name.split('.')[1]}</b>{tab.title ? `\n${tab.title}` : ''} [Ctrl+{i + 1}]" isActive={activeTab === tab.id} on:click={() => openDrawerTab(tab)} on:dblclick={closeDrawer}>
-                        <Icon id={tab.icon} size={1.3} white={activeTab === tab.id} />
+                    {@const tabColor = drawerColors[tab.id]}
+                    {@const ink = tabColor === cueCardColor ? "#ffffff" : "#17232c"}
+                    <MaterialButton id={tab.id} style="{tabColor ? `background: ${tabColor} !important;color: ${ink} !important;--text: ${ink};${activeTab === tab.id ? `box-shadow: inset 0 -3px ${ink} !important;` : ''} ` : ''}border-radius: 0;border-bottom: 2px solid var(--primary);padding: 0.2em 0.8em;" class="context #drawer_top" title="<b>{tab.name.split('.')[0]}.{tab.name.split('.')[1]}</b>{tab.title ? `\n${tab.title}` : ''} [Ctrl+{i + 1}]" isActive={activeTab === tab.id} on:click={() => openDrawerTab(tab)} on:dblclick={closeDrawer}>
+                        <Icon id={tab.icon} size={1.3} color={tabColor ? ink : ""} white={!tabColor && activeTab === tab.id} />
                         {#if !$labelsDisabled && !$focusMode}
                             <span><T id={tab.name} /></span>
                         {/if}
