@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { cueHeadingColor } from "../../../../types/churchQueueColor"
     import { churchContentName } from "../../../../types/ChurchContentName"
     import { uid } from "uid"
     import { buildChurchProgram, programFileType, type ProgramDraft, type ProgramRow } from "../../../../types/ChurchProgramBuilder"
@@ -168,6 +169,52 @@
             message = "Texten har lagts till. Skriv en rubrik för punkten."
         }
     }
+    function printPlan() {
+        const frame = document.createElement("iframe")
+        frame.setAttribute("title", "Utskrift av program")
+        frame.style.cssText = "position:fixed;left:-10000px;top:0;width:720px;height:900px;border:0"
+        document.body.appendChild(frame)
+        const page = frame.contentDocument
+        const view = frame.contentWindow
+        if (!page || !view) { frame.remove(); return }
+        page.documentElement.lang = "sv"
+        page.title = draft.title.trim() || "Gudstjänstprogram"
+        const style = page.createElement("style")
+        style.textContent = `
+            @page { size:A4; margin:19mm; }
+            body { margin:0 auto; max-width:155mm; font:12pt/1.4 Arial,sans-serif; color:#1e2933; }
+            h1 { font: bold 26pt/1.15 Georgia,serif; margin:0 0 7mm; overflow-wrap:anywhere; }
+            section { break-inside:avoid; padding:2.5mm 1mm; border-bottom:1px solid #d9dee2; display:flex; justify-content:space-between; gap:5mm; }
+            section.cue { margin-top:4mm; font-weight:bold; border-left:4pt solid; padding-left:3mm; break-after:avoid; }
+            span { overflow-wrap:anywhere; }
+            .person { text-align:right; color:#394752; max-width:42%; }
+        `
+        page.head.appendChild(style)
+        const heading = page.createElement("h1")
+        heading.textContent = page.title
+        page.body.appendChild(heading)
+        for (const row of draft.rows) {
+            const line = page.createElement("section")
+            const label = page.createElement("span")
+            label.textContent = row.title.trim() || $shows[row.resourceId]?.name || row.file?.name || (row.kind === "cue" ? "Hållpunkt" : row.kind === "song" ? "Sång" : "Studium")
+            if (row.kind === "cue") {
+                line.className = "cue"
+                line.style.borderLeftColor = cueHeadingColor(label.textContent)
+            }
+            line.appendChild(label)
+            if (row.person.trim()) {
+                const person = page.createElement("span")
+                person.className = "person"
+                person.textContent = row.person.trim()
+                line.appendChild(person)
+            }
+            page.body.appendChild(line)
+        }
+        view.addEventListener("afterprint", () => frame.remove(), { once: true })
+        view.focus()
+        view.print()
+    }
+
     function create() {
         try {
             const pending: { id: string; show: ShowObj }[] = []
@@ -212,6 +259,7 @@
             <h2>Planering</h2>
             <p>Dra en sång eller fil till en punkt. Välj medverkande i punktens lista eller dra dit ett namn.</p>
         </div>
+        <button disabled={!draft.rows.length} on:click={printPlan}>Skriv ut / PDF</button>
         <button class="create" disabled={busy || created || !draft.rows.length || !draft.title.trim()} on:click={create}>Skapa program och öppna Show</button>
     </header>
     <label class="title">Programmets rubrik<input bind:value={draft.title} on:input={() => (created = false)} placeholder="Till exempel Sabbatsgudstjänst – Hopp" /></label>
