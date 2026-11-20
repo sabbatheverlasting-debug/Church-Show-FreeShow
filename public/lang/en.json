@@ -420,6 +420,14 @@
         "change_folder": "Choose another location"
     },
     "tabs": {
+        "songs": "Songs",
+        "books": "Books",
+        "questions": "Questions",
+        "cues": "Cues",
+        "songs_info": "Songs with linked audio and planning",
+        "books_info": "Books and source texts",
+        "questions_info": "Quizzes and Bible Manna",
+        "cues_info": "Reusable program cues",
         "shows": "Shows",
         "shows_info": "A show is made up of slides; it can be a song, presentation, media, scripture, and more.",
         "media": "Media",

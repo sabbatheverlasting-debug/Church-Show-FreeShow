@@ -382,6 +382,14 @@
         "change_folder": "Välj en annan plats"
     },
     "tabs": {
+        "songs": "Sånger",
+        "books": "Böcker",
+        "questions": "Frågor",
+        "cues": "Hållpunkter",
+        "songs_info": "Sånger med ljudkopplingar och planering",
+        "books_info": "Böcker och källtexter",
+        "questions_info": "Frågesport och Bibelmanna",
+        "cues_info": "Återanvändbara hållpunkter",
         "shows": "Shower",
         "shows_info": "En show är uppgjord av sidor; det kan vara låtar, presentationer, media, bibel texter och annat. ",
         "media": "Media",
