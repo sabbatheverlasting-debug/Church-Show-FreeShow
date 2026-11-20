@@ -1,3 +1,4 @@
+import { pairChurchAudio } from "../../converters/churchAudio"
 import { get } from "svelte/store"
 import { uid } from "uid"
 import { EXPORT, OUTPUT } from "../../../types/Channels"
@@ -256,6 +257,10 @@ const clickActions = {
 
     // main
     custom_text: () => activePopup.set("custom_text"),
+    unlink_church_audio: (obj: ObjData) => {
+        const showId = obj.contextElem?.closest<HTMLElement>("[data-paired-show]")?.dataset.pairedShow
+        if (showId) void pairChurchAudio(showId, null)
+    },
     rename: (obj: ObjData) => {
         const id = obj.sel?.id || obj.contextElem?.id
         if (!id) return

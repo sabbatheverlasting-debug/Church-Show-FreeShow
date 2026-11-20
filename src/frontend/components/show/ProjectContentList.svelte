@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy, onMount } from "svelte"
     import { fade } from "svelte/transition"
+    import { churchQueueColor } from "../../../types/churchQueueColor"
     import type { ProjectShowRef, Tree } from "../../../types/Projects"
     import type { ShowType } from "../../../types/Show"
     import { addProjectItem, addToProject, updateRecentlyAddedFiles } from "../../converters/project"
@@ -290,10 +291,11 @@
                             {:else}
                                 <SelectElem id="show" dropAbove={isFirst} triggerOnHover data={{ ...show, name: show.name || removeExtension(getFileName(show.id)), index }} {fileOver} borders={show.type === "show_placeholder" ? "all" : "edges"} trigger="column" draggable={!isLocked} selectable={!isLocked}>
                                     {#if show.type === "section"}
+                                        {@const sectionColor = show.color || churchQueueColor("", show.name || "", "section")}
                                         <MaterialButton
                                             {isActive}
                                             class="section {projectReadOnly || isLocked ? '' : `context #project_section ${show.color ? 'color-border' : ''}`}"
-                                            style="{borderRadiusStyle}justify-content: left;background-color: var(--primary-darkest);border-top: 1px solid var(--primary-lighter);padding: 0.1em 1em;{$fullColors ? `background-color: ${show.color || 'var(--primary-darker)'} !important;color: ${getContrast(show.color || '')};` : `background-color: ${fadeColor(show.color || '', 0.2)} !important;color: ${show.color ? brightenDarkColor(show.color) : ''};`}"
+                                            style="{borderRadiusStyle}justify-content: left;background-color: var(--primary-darkest);border-top: 1px solid var(--primary-lighter);padding: 0.1em 1em;{!show.color || $fullColors ? `background-color: ${sectionColor} !important;color: ${getContrast(sectionColor)};` : `background-color: ${fadeColor(show.color || '', 0.2)} !important;color: ${show.color ? brightenDarkColor(show.color) : ''};`}"
                                             on:click={(e) => {
                                                 if (e.detail.ctrl) return
                                                 if ($focusMode) activeFocus.set({ id: show.id, index, type: show.type })

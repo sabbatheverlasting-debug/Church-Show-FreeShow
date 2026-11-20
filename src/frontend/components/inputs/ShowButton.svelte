@@ -1,5 +1,6 @@
 <script lang="ts">
     import { droppedAudio, pairChurchAudio } from "../../converters/churchAudio"
+    import { churchQueueColor } from "../../../types/churchQueueColor"
     import type { ClickEvent } from "../../../types/Main"
     import { AudioPlayer } from "../../audio/audioPlayer"
     import { activeEdit, activeFocus, activePage, activeProject, activeShow, categories, editingProjectTemplate, effects, focusMode, globalTags, media, notFound, outLocked, outputs, overlayCategories, overlays, playerVideos, playingAudio, projects, projectTemplates, refreshEditSlide, shows, showsCache, special, styles, textCache } from "../../stores"
@@ -37,6 +38,8 @@
     export let isProject: boolean = false
     $: type = show.type || "show"
     $: name = type === "show" ? $shows[show.id]?.name : type === "overlay" ? $overlays[show.id]?.name : type === "effect" ? $effects[show.id]?.name : type === "player" ? ($playerVideos[id] || show.data?.id ? $playerVideos[id]?.name || show.data?.name || show.data?.id : setNotFound(id)) : show.name
+    $: categoryId = $shows[id]?.category || ""
+    $: queueColor = isProject ? churchQueueColor(categoryId + " " + ($categories[categoryId]?.name || ""), name || show.name || "", type, !!$shows[id]?.quickAccess?.churchAudio) : ""
     // export let page: "side" | "drawer" = "drawer"
     export let match: null | number = null
     export let searchValue = ""
@@ -274,7 +277,7 @@
     $: showTemplateName = type === "show_placeholder" ? (show.name && show.name !== "—" ? show.name : translateText("new.placeholder")) + (showPlaceholderShowName ? ` (${showPlaceholderShowName})` : "") : ""
 </script>
 
-<div on:dragover|preventDefault on:drop={pairDrop} id="show_{id}" class="main" class:isProject class:played={show.played}>
+<div on:dragover|preventDefault on:drop={pairDrop} id="show_{id}" data-paired-show={type === "show" && !readOnly && (!isProject || $$props.class) && $shows[id]?.quickAccess?.churchAudio ? id : undefined} class="main" class:queueCard={!!queueColor} style:--queue-card={queueColor} class:isProject class:played={show.played}>
     <MaterialButton on:click={click} on:dblclick={doubleClick} {isActive} showOutline={outline} class="context {$$props.class}{readOnly ? '_readonly' : ''}" style="font-weight: normal;--outline-color: {activeOutput || 'var(--secondary)'};{$notFound.show?.includes(id) ? 'background-color: rgb(255 0 0 / 0.2);' : ''}{$$props.style || ''}" tab>
         <div class="row" style={type === "show_placeholder" ? "font-style: italic;" : ""}>
             <span class="cell" style={isProject ? `width: 100%;max-width: ${show.layoutInfo?.name || show.scheduleLength ? 92 : 100}%;` : `width: 75%;min-width: 120px;max-width: calc(100% ${showNumber ? "- var(--number-width)" : ""} - var(--modified-width, 0px));`}>
@@ -349,8 +352,7 @@
         {/if}
     </MaterialButton>
     {#if type === "show" && $shows[id]?.quickAccess?.churchAudio}
-        <span style="font-size:0.8em;padding:2px 8px;" title="Ljudet startar på första bilden och fortsätter mellan verserna">♫ {$shows[id].quickAccess.churchAudio.name}</span>
-        {#if !readOnly}<button title="Koppla loss ljudfilen" on:click|stopPropagation={() => pairChurchAudio(id, null)}>Koppla loss</button>{/if}
+        <span class="context {$$props.class || ''}{readOnly ? '_readonly' : ''}" style="font-size:0.8em;padding:2px 8px;" title="Ljudet startar på första bilden och fortsätter mellan verserna">♫ {$shows[id].quickAccess.churchAudio.name}</span>
     {/if}
 
     {#if match !== null}
@@ -379,6 +381,16 @@
     }
     .main:not(.isProject) :global(button) {
         border-left: 0 !important;
+    }
+
+    .queueCard {
+        background: var(--queue-card);
+        color: #17232c;
+        --text: #17232c;
+    }
+    .queueCard :global(button.tab) {
+        background-color: transparent !important;
+        color: #17232c;
     }
 
     .row {

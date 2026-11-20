@@ -41,6 +41,7 @@ export const contextMenuItems: { [key: string]: ContextMenuItem } = {
     settings: { label: "menu.settings", icon: "settings", iconColor: "var(--secondary)" },
     about: { label: "main.about", icon: "info" },
     shortcuts: { label: "popup.shortcuts", icon: "shortcut", shortcuts: ["Ctrl+?"] },
+    unlink_church_audio: { label: "Koppla loss", translate: false },
     rename: { label: "actions.rename", icon: "rename", iconColor: "#6effbe", shortcuts: ["F2"] },
     delete: { label: "actions.delete", icon: "delete", iconColor: "#ff5454", shortcuts: ["Del"] },
     delete_remove: { label: "actions.remove", icon: "delete", iconColor: "#ff6b54", shortcuts: ["Del"] },

@@ -59,6 +59,7 @@
         }
 
         activeMenu = [...(getContextMenu(id) || contextMenuLayouts.default)]
+        if (contextElem?.closest("[data-paired-show]")) activeMenu.push("unlink_church_audio")
         // show "Copy ID" button if API is enabled
         if ($serverData?.companion?.enabled && id) {
             const baseId = id.slice(1).split("_readonly")[0].split("_default")[0]
