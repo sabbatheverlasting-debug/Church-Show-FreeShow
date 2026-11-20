@@ -353,7 +353,7 @@ export interface MainReturnPayloads {
     [Main.SHOW]: { id: string; error?: string; content?: [string, Show] }
     ///
     [Main.CHURCH_AUDIO_FILES]: any
-    [Main.SHARE_PROGRAM]: string
+    [Main.SHARE_PROGRAM]: Promise<string>
     [Main.CHURCH_QUIZ]: any
     [Main.CHURCH_CALENDAR]: any
     [Main.CHURCH_SONG_STYLES]: any
