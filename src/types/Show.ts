@@ -16,7 +16,7 @@ export interface CustomFont {
 }
 
 export interface Show {
-    churchBook?: { sections: { title?: string; text: string; source?: string }[] }
+    churchBook?: { html?: string; sections: { title?: string; text: string; source?: string }[] }
     name: string
     id?: string // this id should not be stored (but often used in the program as a temporary value)
     origin?: string // "pco" | "churchApps" | "hymnary", etc.
