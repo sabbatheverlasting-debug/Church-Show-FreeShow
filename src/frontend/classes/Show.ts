@@ -6,7 +6,7 @@ import { activeShow, templates } from "../stores"
 import { translateText } from "../utils/language"
 
 export class ShowObj implements Show {
-    churchBook?: { sections: { title?: string; text: string; source?: string }[] }
+    churchBook?: { html?: string; sections: { title?: string; text: string; source?: string }[] }
     name: string
     origin?: string
     private?: boolean

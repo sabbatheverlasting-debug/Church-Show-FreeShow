@@ -61,7 +61,7 @@
         .filter(([id, show]) => show.category === category && (show.name + " " + JSON.stringify($textCache[id] || "")).toLocaleLowerCase().includes(searchValue.toLocaleLowerCase()))
         .map(([id, show]) => ({ ...show, id }))
     function importPackage() {
-        sendMain(Main.IMPORT, { channel: "church_package", format: { name: "Gemensam import · ZIP / JSON / text", extensions: ["zip", "json", "txt", "md", "epub", "usx"] } })
+        sendMain(Main.IMPORT, { channel: "church_package", format: { name: "Gemensam import · ZIP / JSON / text", extensions: ["zip", "json", "txt", "md", "html", "htm", "xhtml", "epub", "usx"] } })
         activePopup.set(null)
     }
 </script>
@@ -88,7 +88,9 @@
     <article on:dragstart={dragQuote} style="padding:20px;max-width:900px;user-select:text;">
         <h2>{reading.name}</h2>
         <p>Markera ett utdrag och dra det till projektet eller bildspelet. Källan följer med.</p>
-        {#if chapters.length}
+        {#if reading.churchBook?.html}
+            <iframe title={reading.name} sandbox="" class="document-reader" srcdoc={'<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;unsafe-inline&apos;"><style>body{max-width:68ch;margin:auto;padding:2rem;background:#fffdf8;color:#24211c;font:20px/1.65 Georgia,serif;overflow-wrap:anywhere}h1,h2,h3{line-height:1.2}blockquote{border-left:3px solid #ad8953;margin-left:0;padding-left:1em}td,th{padding:.4em;border:1px solid #ccc}table{border-collapse:collapse}pre{white-space:pre-wrap}</style>' + reading.churchBook.html}></iframe>
+        {:else if chapters.length}
             <label>Sök i boken <input type="search" bind:value={bookSearch} placeholder="Ord eller mening" /></label>
             <nav aria-label="Bokens kapitel" style="max-height:180px;overflow:auto;display:flex;flex-direction:column;">
                 {#each matchingChapters as chapter}
@@ -106,6 +108,7 @@
 {/if}
 
 <style>
+    .document-reader { width:100%; height:60vh; border:0; background:white; }
     .cue-heading { padding: 5px 10px; color: white; font-weight: 700; cursor: grab; }
     .chosen {
         border-left: 3px solid #d6ba79;

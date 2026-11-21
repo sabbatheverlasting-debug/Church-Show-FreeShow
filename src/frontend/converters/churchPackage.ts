@@ -1,3 +1,4 @@
+import { readChurchHtml } from "./churchHtml"
 import { churchContentName } from "../../types/ChurchContentName"
 import { parseUsxBibles } from "../../types/ChurchUsx"
 import type { Bible } from "json-bible/lib/Bible"
@@ -15,7 +16,7 @@ import { activePopup, alertMessage, categories, shows } from "../stores"
 export const churchCategories = { book: "church_books", study: "church_studies", question: "church_questions", cue: "church_cues" }
 const labels = { book: "Böcker", study: "Studier", question: "Frågor · Bibelmanna", cue: "Hållpunkter" }
 
-export function installChurchResource(resource: ChurchResource, packageId: string) {
+export function installChurchResource(resource: ChurchResource, packageId: string, html?: string) {
     const id = "church_" + encodeURIComponent(packageId) + "_" + encodeURIComponent(resource.id)
     if (get(shows)[id]) return false // Reinstalling never overwrites the user's edits.
     const category = churchCategories[resource.kind]
@@ -29,16 +30,22 @@ export function installChurchResource(resource: ChurchResource, packageId: strin
     show.meta = { publisher: resource.source || "" }
     const layout = show.layouts[show.settings.activeLayout]
     if (resource.kind === "book") {
-        show.churchBook = { sections: resource.sections }
+        show.churchBook = { sections: resource.sections, html }
+    }
+    if (resource.kind === "book" && !html) {
         const slideId = uid()
         show.slides[slideId] = { group: resource.title, color: null, settings: { color: "#122c38" }, notes: resource.source || "", items: [{ style: "left:100px;top:200px;width:1720px;height:680px;", lines: [{ text: [{ value: resource.title, style: "font-size:64px;color:#fff7e4;" }] }] }] }
         layout.slides.push({ id: slideId })
     }
-    for (const section of resource.kind === "book" ? [] : resource.sections) {
+    for (const section of resource.kind === "book" && !html ? [] : resource.sections) {
         const source = section.source || resource.source || ""
         for (const text of splitChurchText(section.text)) {
             const slideId = uid()
             const items = resource.kind === "cue" ? [] : [{ style: "left:100px;top:110px;width:1720px;height:780px;", align: "center", lines: [{ align: "center", text: [{ value: text, style: "font-size:64px;color:#fff7e4;" }] }] }]
+            if (html && section.title) {
+                items[0].style = "left:140px;top:270px;width:1640px;height:660px;"
+                items.push({ style: "left:140px;top:65px;width:1640px;height:170px;", align: "center", lines: [{ align: "center", text: [{ value: section.title, style: "font-size:68px;color:#f4d58f;" }] }] })
+            }
             if (source && items.length) items.push({ style: "left:100px;top:940px;width:1720px;height:90px;", align: "center", lines: [{ align: "center", text: [{ value: source, style: "font-size:28px;color:#d6ba79;" }] }] })
             show.slides[slideId] = { group: section.title || resource.title, color: null, settings: { color: "#122c38" }, notes: [resource.kind === "cue" ? text : "", source, section.answer ? "Svar: " + section.answer : ""].filter(Boolean).join("\n"), items }
             layout.slides.push({ id: slideId })
@@ -90,6 +97,12 @@ export function importChurchPackages(files: { name?: string; content: string; ex
             if (/(^|[\\/])(__MACOSX|\._[^\\/]*)($|[\\/])/.test(name)) continue
             if (/(?:^|\/)(README|LAS-MIG|LÄS-MIG)\.txt$/i.test(name)) continue
             if (containsStylePack && file.extension === "svg") continue
+            if (["html", "htm", "xhtml"].includes(file.extension?.toLowerCase() || "")) {
+                const { resource, html } = readChurchHtml(name, file.content)
+                if (installChurchResource(resource, "html", html)) installed++
+                else duplicates++
+                continue
+            }
             if (["txt", "md"].includes(file.extension || "")) {
                 const resource: ChurchResource = { id: name, title: name.replace(/\.(txt|md)$/i, ""), kind: "study", sections: [{ text: file.content }] }
                 if (installChurchResource(resource, "text")) installed++

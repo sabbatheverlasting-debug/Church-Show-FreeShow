@@ -117,7 +117,7 @@
     variant="outlined"
     style="margin-bottom:12px;"
     on:click={() => {
-        sendMain(Main.IMPORT, { channel: "church_package", format: { name: "Gemensam import", extensions: ["zip", "json", "txt", "md", "epub", "usx"] } })
+        sendMain(Main.IMPORT, { channel: "church_package", format: { name: "Gemensam import", extensions: ["zip", "json", "txt", "md", "html", "htm", "xhtml", "epub", "usx"] } })
         activePopup.set(null)
     }}>Gemensam import · ZIP, böcker, studier, bakgrunder och teman</MaterialButton
 >
